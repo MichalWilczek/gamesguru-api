@@ -6,7 +6,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from pydantic import ValidationError
 
-from src.schemas import ElementData
+from gamesguru.schemas import ElementData
 
 _logger = logging.getLogger(__name__)
 
@@ -15,7 +15,7 @@ MEDIA_EXPERT_HOST = "https://www.mediaexpert.pl"
 MEDIA_EXPERT_URL = f"{MEDIA_EXPERT_HOST}/search?query[menu_item]=&query[querystring]=playstation%20"
 
 
-async def scrap_page(url: str) -> str:
+def scrap_page(url: str) -> str:
     driver = webdriver.Chrome()
     driver.get(url)
     time.sleep(2)
@@ -45,12 +45,12 @@ def scroll_down_page(driver):
         last_height = new_height
 
 
-async def get_media_expert_data() -> list[ElementData] | None:
-    html_source = await scrap_page(MEDIA_EXPERT_URL)
+def get_media_expert_data() -> list[ElementData] | None:
+    html_source = scrap_page(MEDIA_EXPERT_URL)
     if html_source is None:
         return None
 
-    soup = BeautifulSoup(html_source)
+    soup = BeautifulSoup(html_source, features="html.parser")
     offer_boxes = soup.find_all(class_=re.compile("offer-box"))
 
     results = []
@@ -70,9 +70,9 @@ async def get_media_expert_data() -> list[ElementData] | None:
         try:
             results.append(ElementData(
                 name=name,
-                link=link,
                 price=price_value,
-                currency=price_currency
+                currency=price_currency,
+                url=link
             ))
         except ValidationError:
             pass
@@ -81,5 +81,4 @@ async def get_media_expert_data() -> list[ElementData] | None:
 
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(get_media_expert_data())
+    get_media_expert_data()
