@@ -6,7 +6,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from pydantic import ValidationError
 
-from gamesguru.schemas import ElementData
+from gamesguru.products.schemas import ProductSchemaIn
 
 _logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ def scroll_down_page(driver):
         last_height = new_height
 
 
-def get_media_expert_data() -> list[ElementData] | None:
+def get_media_expert_data() -> list[ProductSchemaIn] | None:
     html_source = scrap_page(MEDIA_EXPERT_URL)
     if html_source is None:
         return None
@@ -68,7 +68,7 @@ def get_media_expert_data() -> list[ElementData] | None:
         price_currency = ''.join(price_currency.split())
 
         try:
-            results.append(ElementData(
+            results.append(ProductSchemaIn(
                 name=name,
                 price=price_value,
                 currency=price_currency,

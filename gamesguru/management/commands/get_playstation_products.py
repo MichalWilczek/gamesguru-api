@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from django.core.management.base import BaseCommand
 
-from gamesguru.schemas import ElementData
+from gamesguru.products.schemas import ProductSchemaIn
 from gamesguru.products.models import Product, Shop
 from gamesguru.external_apis import get_media_expert_data
 
@@ -34,9 +34,9 @@ class Command(BaseCommand):
 
         return 0
 
-    def _insert_products(self, products: list[ElementData], shop: Product, pub_time: datetime):
+    def _insert_products(self, products: list[ProductSchemaIn], shop: Product, pub_time: datetime):
         objs = []
         for product_data in products:
             data = product_data.dict()
             objs.append(Product(shop=shop, pub_time=pub_time, **data))
-        return Product.objects.bulk_create(objs)
+        return Product.objects.bulk_create(objs, ignore_conflicts=True)

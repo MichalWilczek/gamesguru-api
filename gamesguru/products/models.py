@@ -16,6 +16,9 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
+        constraints = [
+            models.UniqueConstraint(fields=["url"], name="unique_url")
+        ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.TextField(max_length=500)
