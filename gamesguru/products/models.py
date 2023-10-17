@@ -9,7 +9,8 @@ class Shop(models.Model):
         verbose_name_plural = "Shops"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
-    name = models.CharField(max_length=25)
+    name = models.CharField(max_length=100)
+    tracking_url = models.TextField(max_length=1000, default=None, blank=True)
 
 
 class Product(models.Model):
@@ -23,7 +24,8 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.TextField(max_length=500)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.TextField(max_length=10)
+    currency = models.CharField(max_length=20)
     url = models.TextField(max_length=1000)
+    affiliation_url = models.TextField(max_length=1000, default=None, blank=True)
     pub_time = models.DateTimeField("Publication time")
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
