@@ -1,6 +1,6 @@
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema
 
-from gamesguru.products.models import Shop, Product
+from gamesguru.products.models import Shop, Offer
 
 
 class ShopSchemaFull(ModelSchema):
@@ -15,16 +15,15 @@ class ShopSchemaProduct(ModelSchema):
         model_fields = ["id", "name"]
 
 
-class ProductSchemaIn(ModelSchema):
+class OfferSchemaIn(ModelSchema):
     class Config:
-        model = Product
-        model_fields = ["name", "price", "currency", "url", "affiliation_url"]
-        model_fields_optional = ["affiliation_url"]
+        model = Offer
+        model_fields = ["name", "price", "currency", "url"]
 
 
-class ProductSchemaOut(ModelSchema):
-    shop: ShopSchemaProduct
-
-    class Config:
-        model = Product
-        model_fields = ["name", "price", "currency", "affiliation_url", "shop"]
+class OfferSchemaOut(Schema):
+    name: str
+    price: float
+    currency: str
+    shop_name: str
+    affiliation_url: str

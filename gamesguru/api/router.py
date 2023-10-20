@@ -1,9 +1,10 @@
 from datetime import datetime, timedelta, timezone
 
+from django.db.models import F
 from ninja import Router, Schema
 
-from gamesguru.products.models import Product
-from gamesguru.products.schemas import ProductSchemaOut
+from gamesguru.products.models import Offer
+from gamesguru.products.schemas import OfferSchemaOut
 
 
 router = Router()
@@ -19,17 +20,18 @@ def healthz(request):
 
 
 @router.get("/products", response={
-    200: list[ProductSchemaOut],
+    200: list[OfferSchemaOut],
     204: Error,
     500: Error
 })
 def products(request):
     now = datetime.now(timezone.utc)
     try:
-        objs = Product.objects.filter(
+        objs = Offer.objects.filter(
             name__icontains="playstation 5",
             pub_time__gte=now - timedelta(days=30)
-        ).order_by("price")[:5]
+        ).order_by("price")[:5].select_related('shop').annotate(shop_name=F('shop__name'))
+        a = list(objs)
     except BaseException as e:
         return 500, {"msg": f"Unexpected error occured. Error: {e}"}
     if len(objs) == 0:

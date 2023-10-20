@@ -3,7 +3,7 @@
     "model": "products.shop",
     "pk": "09a2ccea-a813-42bb-a5c1-c93a3130c98a",
     "fields": {
-      "name": "RTV EURO AGD (PL)",
+      "name": "RTV EURO AGD",
       "tracking_url": "https://clk.tradedoubler.com/click?p=118512&a=3285554"
     }
   },
@@ -11,7 +11,7 @@
     "model": "products.shop",
     "pk": "c2070737-3738-46d3-b417-8af144e192d3",
     "fields": {
-      "name": "MediaExpert (PL)",
+      "name": "MediaExpert",
       "tracking_url": "https://clk.tradedoubler.com/click?p=237638&a=3285554"
     }
   },
@@ -19,7 +19,7 @@
     "model": "products.shop",
     "pk": "dd5924d7-5e6d-42b6-885e-5b00b87ab1e8",
     "fields": {
-      "name": "Media Markt (PL)",
+      "name": "Media Markt",
       "tracking_url": "https://clk.tradedoubler.com/click?p=229227&a=3285554"
     }
   },
@@ -27,8 +27,81 @@
     "model": "products.shop",
     "pk": "e7fc39db-512c-462e-b81f-3e40f0deecda",
     "fields": {
-      "name": "Allegro.pl (PL)",
+      "name": "Allegro.pl",
       "tracking_url": "https://clk.tradedoubler.com/click?p=288386&a=3285554"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b",
+    "fields": {
+      "epi": "cac61076-b8c0-457c-999d-ad8be596ad0e",
+      "name": "Playstation 5"
+    }
+  },
+  {
+    "model": "products.offer",
+    "pk": "0612daac-b149-46bf-9d23-2c1132501f7d",
+    "fields": {
+      "name": "Konsola SONY PlayStation 5 z napędem Blu-ray 4K UHD Marvel's Spider-Man 2 Edition",
+      "price": "3099.00",
+      "currency": "zł",
+      "url": "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-marvel-s-spider-man-2-edition",
+      "pub_time": "2023-10-20T17:51:17.935Z",
+      "shop": "c2070737-3738-46d3-b417-8af144e192d3",
+      "product": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b"
+    }
+  },
+  {
+    "model": "products.offer",
+    "pk": "0bd50f0d-4e81-4864-9b5e-d7b7f11b22b2",
+    "fields": {
+      "name": "Konsola SONY PlayStation 5 z napędem Blu-ray 4K UHD + Gra Marvel’s Spider-Man 2 + Kontroler SONY DualSense Galaktyczny Fiolet",
+      "price": "3288.00",
+      "currency": "zł",
+      "url": "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-z-napedem-blu-ray-4k-uhd-gra-marvel-s-spider-man-2-kontroler-sony-dualsense-galaktyczny-fiole",
+      "pub_time": "2023-10-20T18:05:52.386Z",
+      "shop": "c2070737-3738-46d3-b417-8af144e192d3",
+      "product": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b"
+    }
+  },
+  {
+    "model": "products.offer",
+    "pk": "116ac6c6-7c79-4058-bb18-2924ebe66d12",
+    "fields": {
+      "name": "Konsola SONY PlayStation 5 z napędem Blu-ray 4K UHD + EA SPORTS FC 24  (klucz aktywacyjny)",
+      "price": "2549.00",
+      "currency": "zł",
+      "url": "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-ea-sports-fc-24-klucz-aktywacyjny",
+      "pub_time": "2023-10-20T17:51:17.935Z",
+      "shop": "c2070737-3738-46d3-b417-8af144e192d3",
+      "product": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b"
+    }
+  },
+  {
+    "model": "products.offer",
+    "pk": "af2bb345-72cf-4582-9b4a-7252921210bc",
+    "fields": {
+      "name": "Konsola SONY PlayStation 5 z napędem Blu-ray 4K UHD + Gra Marvel’s Spider-Man 2",
+      "price": "2959.00",
+      "currency": "zł",
+      "url": "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-gra-marvel-s-spider-man-2",
+      "pub_time": "2023-10-20T17:51:17.935Z",
+      "shop": "c2070737-3738-46d3-b417-8af144e192d3",
+      "product": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b"
+    }
+  },
+  {
+    "model": "products.offer",
+    "pk": "cbbad660-398f-4c6e-81cf-51b735151869",
+    "fields": {
+      "name": "Konsola SONY PlayStation 5 + Marvel's Spider-Man: Miles Morales Gra PS5",
+      "price": "3043.00",
+      "currency": "zł",
+      "url": "https://www.mediaexpert.pl/gaming/playstation-5/konsole-ps5/konsola-sony-playstation-5-marvel-s-spider-man-miles-morales-gra-ps5",
+      "pub_time": "2023-10-20T17:51:17.935Z",
+      "shop": "c2070737-3738-46d3-b417-8af144e192d3",
+      "product": "3f919ed1-1a38-42a2-bda3-d6d07bf1b63b"
     }
   }
 ]
