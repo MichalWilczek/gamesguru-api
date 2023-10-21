@@ -1,1 +1,1 @@
-# gamesguru-products-api
+# gamesguru-api

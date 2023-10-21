@@ -15,7 +15,7 @@ class Error(Schema):
 
 
 @router.get("/healthz")
-def healthz(request):
+async def healthz(request):
     return {"message": "ok"}
 
 
@@ -25,15 +25,13 @@ def healthz(request):
     500: Error
 })
 def products(request):
-    now = datetime.now(timezone.utc)
     try:
         objs = Offer.objects.filter(
             name__icontains="playstation 5",
-            pub_time__gte=now - timedelta(days=30)
+            pub_time__gte=datetime.now(timezone.utc) - timedelta(days=30)
         ).order_by("price")[:5].select_related('shop').annotate(shop_name=F('shop__name'))
-        a = list(objs)
     except BaseException as e:
         return 500, {"msg": f"Unexpected error occured. Error: {e}"}
     if len(objs) == 0:
-        return 204, {"msg": "No data in the database from the last month."}
+        return 204, {"msg": "No data in the database from the last 30 days."}
     return 200, objs

@@ -1,0 +1,38 @@
+---
+version: '3'
+
+services:
+  gamesguru:
+    build:
+      context: .  # build docker-compose inside the current directory
+    ports:
+      - "8000:8000"  # map port 8000 on the local machine to the port in the docker container
+    volumes:
+      - ./gamesguru:/gamesguru  # map the app directory to the directory in the running container
+      - gamesguru-static-data:/vol/web
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=postgres
+      - DB_PASSWORD=postgres
+      - STATIC_ROOT=vol/web/static
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    volumes:
+      - gamesguru-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=gamesguru
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+
+volumes:
+  gamesguru-db-data:
+  gamesguru-static-data:
