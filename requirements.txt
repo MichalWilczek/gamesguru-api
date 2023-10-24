@@ -4,6 +4,7 @@ asgiref==3.7.2
 attrs==23.1.0
 beautifulsoup4==4.12.2
 certifi==2023.7.22
+click==8.1.7
 coverage==7.3.2
 Django==4.2.6
 django-ninja==0.22.2
@@ -14,7 +15,6 @@ Faker==19.6.2
 freezegun==1.2.2
 h11==0.14.0
 httpcore==0.18.0
-httpx==0.25.0
 idna==3.4
 inflection==0.5.1
 iniconfig==2.0.0
@@ -43,4 +43,5 @@ trio==0.22.2
 trio-websocket==0.11.1
 typing_extensions==4.8.0
 urllib3==2.0.6
+uWSGI==2.0.22
 wsproto==1.2.0

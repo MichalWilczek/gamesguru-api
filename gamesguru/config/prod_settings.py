@@ -1,4 +1,1 @@
-ALLOWED_HOSTS = ['*']
-CORS_ALLOWED_ORIGINS = [
-   "https://app.polariumcloud.com",
-]
+ALLOWED_HOSTS = ['146.59.30.182']

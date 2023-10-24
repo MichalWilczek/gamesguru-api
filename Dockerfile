@@ -39,4 +39,4 @@ ENV PATH="/scripts:/py/bin:$PATH"
 # Change the user from 'root' to 'django-user'
 USER django-user
 
-#CMD ["run.sh"]
+CMD ["run.sh"]
