@@ -19,19 +19,24 @@ async def healthz(request):
     return {"message": "ok"}
 
 
-@router.get("/products", response={
+@router.get("/offers", response={
     200: list[OfferSchemaOut],
     204: Error,
     500: Error
 })
-def products(request):
+def offers(
+        request,
+        name: str,
+        latest_pub_date: datetime = datetime.now(timezone.utc) - timedelta(days=30),
+        max_offers_no: int = 5
+):
     try:
         objs = Offer.objects.filter(
-            name__icontains="playstation 5",
-            pub_time__gte=datetime.now(timezone.utc) - timedelta(days=30)
-        ).order_by("price")[:5].select_related('shop').annotate(shop_name=F('shop__name'))
+            name__icontains=name,
+            pub_time__gte=latest_pub_date
+        ).order_by("price")[:max_offers_no].select_related('shop').annotate(shop_name=F('shop__name'))
     except BaseException as e:
         return 500, {"msg": f"Unexpected error occured. Error: {e}"}
     if len(objs) == 0:
-        return 204, {"msg": "No data in the database from the last 30 days."}
+        return 204, {"msg": f"No data in the database from: {latest_pub_date.isoformat()}."}
     return 200, objs
