@@ -12,7 +12,7 @@ services:
       - DB_HOST=postgres
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
-      - DB_PASS=${DB_PASS}
+      - DB_PASSWORD=${DB_PASSWORD}
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - STATIC_URL=/static/static/
       - STATIC_ROOT=vol/web/static
@@ -21,16 +21,17 @@ services:
       - postgres
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15
     restart: always
     volumes:
       - postgres-data-gamesguru:/var/lib/postgresql/data
+      - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - 5432:5432
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
 
   proxy:
     build:
