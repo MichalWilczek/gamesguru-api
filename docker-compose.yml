@@ -33,17 +33,32 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-  proxy:
-    build:
-      context: ./proxy
-    restart: always
+  nginx:
+    image: jonasal/nginx-certbot:latest
+    restart: unless-stopped
     depends_on:
       - gamesguru
+    environment:
+      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
     ports:
-      - "80:8000"  # map port 80 on the server to 8000 on the running container
+      - 80:8000
+      - 443:443
     volumes:
-      - static-data-gamesguru:/vol/web/static
+      - nginx_secrets:/etc/letsencrypt
+      - /proxy/ssl.conf:/etc/nginx/user_conf.d
+
+#  proxy:
+#    build:
+#      context: ./proxy
+#    restart: always
+#    depends_on:
+#      - gamesguru
+#    ports:
+#      - "80:8000"  # map port 80 on the server to 8000 on the running container
+#    volumes:
+#      - static-data-gamesguru:/vol/web/static
 
 volumes:
   postgres-data-gamesguru:
   static-data-gamesguru:
+  nginx_secrets:
