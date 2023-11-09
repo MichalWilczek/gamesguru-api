@@ -7,7 +7,8 @@ services:
       context: .
     restart: always
     volumes:
-      - static-data-gamesguru:/vol/web
+      - gamesguru-static:/vol/web/static
+      - gamesguru-media:/vol/web/media
     environment:
       - DB_HOST=postgres
       - DB_NAME=${DB_NAME}
@@ -24,7 +25,7 @@ services:
     image: postgres:15
     restart: always
     volumes:
-      - postgres-data-gamesguru:/var/lib/postgresql/data
+      - gamesguru-postgres:/var/lib/postgresql/data
       - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - 5432:5432
@@ -33,32 +34,26 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-  nginx:
-    image: jonasal/nginx-certbot:latest
+  caddy:
+    image: caddy:2.7
     restart: unless-stopped
     depends_on:
       - gamesguru
-    environment:
-      - CERTBOT_EMAIL=${CERTBOT_EMAIL}
+    cap_add:
+      - NET_ADMIN
     ports:
-      - 80:8000
-      - 443:443
+      - "80:80"
+      - "443:443"
     volumes:
-      - nginx_secrets:/etc/letsencrypt
-      - /proxy/ssl.conf:/etc/nginx/user_conf.d
-
-#  proxy:
-#    build:
-#      context: ./proxy
-#    restart: always
-#    depends_on:
-#      - gamesguru
-#    ports:
-#      - "80:8000"  # map port 80 on the server to 8000 on the running container
-#    volumes:
-#      - static-data-gamesguru:/vol/web/static
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+      - gamesguru-static:/vol/web/static
+      - gamesguru-media:/vol/web/media
 
 volumes:
-  postgres-data-gamesguru:
-  static-data-gamesguru:
-  nginx_secrets:
+  gamesguru-postgres:
+  gamesguru-static:
+  gamesguru-media:
+  caddy_data:
+  caddy_config:

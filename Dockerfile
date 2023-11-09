@@ -4,8 +4,9 @@ ENV PYTHONUNBUFFERED 1
 
 USER nonroot
 
+COPY --chown=nonroot:nonroot run.sh run.sh
+COPY --chown=nonroot:nonroot gunicorn.conf.py gunicorn.conf.py
 COPY --chown=nonroot:nonroot gamesguru /gamesguru
-COPY --chown=nonroot:nonroot scripts /scripts
 COPY --chown=nonroot:nonroot requirements.txt /tmp/requirements.txt
 COPY --chown=nonroot:nonroot manage.py manage.py
 
@@ -31,10 +32,13 @@ RUN python -m venv /py && \
     mkdir -p /vol/web/static && \
     chown -R django-user:django-user /vol/web/static && \
     chmod -R 755 /vol/web/static && \
-    chmod -R +x /scripts
+    mkdir -p /vol/web/media && \
+    chown -R django-user:django-user /vol/web/media && \
+    chmod -R 755 /vol/web/media && \
+    chmod -R +x run.sh
 
 # Update the environment variable
-ENV PATH="/scripts:/py/bin:$PATH"
+ENV PATH="/:/py/bin:$PATH"
 
 # Change the user from 'root' to 'django-user'
 USER django-user
