@@ -36,26 +36,26 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-#  caddy:
-#    image: caddy:2.7
-#    restart: unless-stopped
-#    depends_on:
-#      - gamesguru
-#    cap_add:
-#      - NET_ADMIN
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    volumes:
-#      - ./Caddyfile:/etc/caddy/Caddyfile
-#      - caddy_data:/data
-#      - caddy_config:/config
-#      - gamesguru-static:/vol/web/static
-#      - gamesguru-media:/vol/web/media
+  caddy:
+    image: caddy:2.7
+    restart: unless-stopped
+    depends_on:
+      - gamesguru
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+      - static:/vol/web/static
+      - media:/vol/web/media
 
 volumes:
   db:
   static:
   media:
-#  caddy_data:
-#  caddy_config:
+  caddy_data:
+  caddy_config:
