@@ -6,25 +6,22 @@ USER nonroot
 
 COPY --chown=nonroot:nonroot run.sh run.sh
 COPY --chown=nonroot:nonroot gunicorn.conf.py gunicorn.conf.py
-COPY --chown=nonroot:nonroot gamesguru /gamesguru
-COPY --chown=nonroot:nonroot requirements.txt /tmp/requirements.txt
+COPY --chown=nonroot:nonroot gamesguru gamesguru
+COPY --chown=nonroot:nonroot requirements.txt requirements.txt
 COPY --chown=nonroot:nonroot manage.py manage.py
 
-EXPOSE 8000
 USER root
 
-RUN python -m venv /py && \
-    /py/bin/pip install --upgrade pip && \
+RUN python -m venv /appenv
+ENV VIRTUAL_ENV /appenv
+ENV PATH /appenv/bin:$PATH
+
+RUN pip install --upgrade pip && \
     apk add --update --no-cache pcre pcre-dev && \
-    # install  postgresql client for psychopg2 \
     apk add --update --no-cache postgresql-client jpeg-dev && \
-    # set virtual dependency package and make it temporary to delete it after psychopg2 is installed
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base postgresql-dev musl-dev zlib zlib-dev linux-headers && \
-    /py/bin/pip install -r /tmp/requirements.txt && \
-    rm -rf /tmp && \
-    # remove temporary dependencies for building -> keep the image as small as possible
-    apk del .tmp-build-deps && \
+    pip install -r requirements.txt && \
     adduser \
         --disabled-password \
         --no-create-home \
@@ -37,10 +34,6 @@ RUN python -m venv /py && \
     chmod -R 755 /vol/web/media && \
     chmod -R +x run.sh
 
-# Update the environment variable
-ENV PATH="/:/py/bin:$PATH"
-
-# Change the user from 'root' to 'django-user'
 USER django-user
 
-CMD ["run.sh"]
+CMD ["/run.sh"]
