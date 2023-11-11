@@ -4,11 +4,11 @@ version: '3'
 services:
   gamesguru:
     build:
-      context: .  # build docker-compose inside the current directory
+      context: .
     ports:
-      - "8000:8000"  # map port 8000 on the local machine to the port in the docker container
+      - "8000:8000"
     volumes:
-      - ./gamesguru:/gamesguru  # map the app directory to the directory in the running container
+      - ./gamesguru:/gamesguru
       - gamesguru-static-data:/vol/web
     command: >
       sh -c "python manage.py wait_for_db &&
@@ -26,6 +26,7 @@ services:
     image: postgres:15
     volumes:
       - gamesguru-db-data:/var/lib/postgresql/data
+      - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     environment:
       - POSTGRES_DB=gamesguru
       - POSTGRES_USER=postgres
