@@ -18,7 +18,6 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PASSWORD=postgres
-      - STATIC_ROOT=vol/web/static
     depends_on:
       - postgres
 

@@ -21,8 +21,9 @@ RUN pip install --upgrade pip && \
     apk add --update --no-cache postgresql-client jpeg-dev && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base postgresql-dev musl-dev zlib zlib-dev linux-headers && \
-    pip install -r requirements.txt && \
-    adduser \
+    pip install -r requirements.txt
+
+RUN adduser \
         --disabled-password \
         --no-create-home \
         django-user && \
