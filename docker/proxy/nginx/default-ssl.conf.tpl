@@ -2,6 +2,10 @@ server {
     listen 80;
     server_name ${DOMAIN} www.${DOMAIN};
 
+    location /static {
+        alias /vol/web/static;
+    }
+
     location /.well-known/acme-challenge/ {
         root /vol/www/;
     }
@@ -29,8 +33,11 @@ server {
     }
 
     location / {
-        uwsgi_pass           ${APP_HOST}:${APP_PORT};
-        include              /etc/nginx/uwsgi_params;
+        proxy_pass ${APP_HOST}:${APP_PORT};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         client_max_body_size 10M;
     }
 }
