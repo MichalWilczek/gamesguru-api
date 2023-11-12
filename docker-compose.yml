@@ -20,6 +20,8 @@ services:
       - ENV=${ENV}
     depends_on:
       - postgres
+    networks:
+      - caddy
 
   postgres:
     image: postgres:15
@@ -50,6 +52,8 @@ services:
       - caddy_config:/config
       - static:/vol/web/static
       - media:/vol/web/media
+    networks:
+      - caddy
 
 volumes:
   db:
@@ -57,3 +61,6 @@ volumes:
   media:
   caddy_data:
   caddy_config:
+
+networks:
+  caddy:
