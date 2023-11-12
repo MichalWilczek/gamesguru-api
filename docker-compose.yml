@@ -1,6 +1,16 @@
 ---
 version: '3'
 
+networks:
+  caddy:
+
+volumes:
+  db:
+  static:
+  media:
+  caddy_data:
+  caddy_config:
+
 services:
   gamesguru:
     build:
@@ -28,13 +38,15 @@ services:
     restart: always
     volumes:
       - db:/var/lib/postgresql/data
-      - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
+#      - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - 5432:5432
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - caddy
 
   caddy:
     image: caddy:2.7
@@ -54,13 +66,3 @@ services:
       - media:/vol/web/media
     networks:
       - caddy
-
-volumes:
-  db:
-  static:
-  media:
-  caddy_data:
-  caddy_config:
-
-networks:
-  caddy:
