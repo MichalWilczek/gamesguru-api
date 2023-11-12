@@ -1,15 +1,13 @@
 ---
 version: '3'
 
-networks:
-  caddy:
-
 volumes:
   db:
   static:
   media:
-  caddy_data:
-  caddy_config:
+  certbot-web:
+  proxy-dhparams:
+  certbot-certs:
 
 services:
   gamesguru:
@@ -31,8 +29,6 @@ services:
       - ENV=${ENV}
     depends_on:
       - postgres
-    networks:
-      - caddy
 
   postgres:
     container_name: postgres
@@ -46,23 +42,34 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    networks:
-      - caddy
 
-  caddy:
-    container_name: caddy
-    image: caddy:2.7
-    restart: unless-stopped
+  proxy:
+    container_name: proxy
+    build:
+      context: ./docker/proxy
+    restart: always
     depends_on:
       - gamesguru
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-      - static:/vol/web/static
-      - media:/vol/web/media
-    networks:
-      - caddy
+      - certbot-web:/vol/www
+      - proxy-dhparams:/vol/proxy
+      - certbot-certs:/etc/letsencrypt
+    environment:
+      - DOMAIN=${DOMAIN}
+
+  certbot:
+    container_name: certbot
+    build:
+      context: ./docker/certbot
+    command: echo "Skipping..."
+    environment:
+      - EMAIL=${ACME_DEFAULT_EMAIL}
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - certbot-web:/vol/www
+      - certbot-certs:/etc/letsencrypt/
+    depends_on:
+      - proxy
