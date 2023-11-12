@@ -13,6 +13,7 @@ volumes:
 
 services:
   gamesguru:
+    container_name: gamesguru
     build:
       context: .
     restart: always
@@ -34,11 +35,11 @@ services:
       - caddy
 
   postgres:
+    container_name: postgres
     image: postgres:15
     restart: always
     volumes:
       - db:/var/lib/postgresql/data
-#      - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     ports:
       - 5432:5432
     environment:
@@ -49,12 +50,11 @@ services:
       - caddy
 
   caddy:
+    container_name: caddy
     image: caddy:2.7
     restart: unless-stopped
     depends_on:
       - gamesguru
-    cap_add:
-      - NET_ADMIN
     ports:
       - "80:80"
       - "443:443"
