@@ -22,8 +22,18 @@ class Command(BaseCommand):
         _logger.info("Fetching data from Media Expert.")
         media_expert_data = get_media_expert_data()
         if media_expert_data:
-            shop = Shop.objects.get(name=self.MEDIA_EXPERT_SHOP_NAME)
-            product = Product.objects.get(name=self.PRODUCT_NAME)
+
+            try:
+                shop = Shop.objects.get(name=self.MEDIA_EXPERT_SHOP_NAME)
+            except Shop.DoesNotExist:
+                _logger.error(f"The shop '{self.MEDIA_EXPERT_SHOP_NAME}' does not exist.")
+                return 1
+
+            try:
+                product = Product.objects.get(name=self.PRODUCT_NAME)
+            except Product.DoesNotExist:
+                _logger.error(f"The product '{self.PRODUCT_NAME}' does not exist.")
+                return 1
 
             products = self._insert_products(
                 media_expert_data,
@@ -33,6 +43,8 @@ class Command(BaseCommand):
             )
             if products:
                 _logger.info(f"Fetched {len(products)} offers from Media Expert to the database.")
+                return 0
+            _logger.error(f"Error while saving products to the database.")
         else:
             _logger.warning("No data fetched from Media Expert.")
 

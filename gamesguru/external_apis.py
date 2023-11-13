@@ -1,6 +1,7 @@
 import logging
 import time
 import re
+import urllib3
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -16,7 +17,23 @@ MEDIA_EXPERT_URL = f"{MEDIA_EXPERT_HOST}/search?query[menu_item]=&query[querystr
 
 
 def scrap_page(url: str) -> str:
-    driver = webdriver.Chrome()
+    options = webdriver.ChromeOptions()
+    options.add_argument('--ignore-ssl-errors=yes')
+    options.add_argument('--ignore-certificate-errors')
+
+    # Try to connect to the running container 'chromedriver' through the docker network.
+    # The 'localhost' network is for debugging purposes when the service is not running in container.
+    try:
+        driver = webdriver.Remote(
+            command_executor='http://chromedriver:4444/wd/hub',
+            options=options
+        )
+    except urllib3.exceptions.MaxRetryError:
+        driver = webdriver.Remote(
+            command_executor='http://localhost:4444/wd/hub',
+            options=options
+        )
+
     driver.get(url)
     time.sleep(2)
     scroll_down_page(driver)
@@ -55,19 +72,19 @@ def get_media_expert_data() -> list[OfferSchemaIn] | None:
 
     results = []
     for box in offer_boxes:
-        link_element = box.find('a', href=re.compile('playstation'))
-
-        link = f"{MEDIA_EXPERT_HOST}{link_element['href']}"
-        name = link_element.text.strip()
-
-        price_element = box.find(class_=re.compile("price-box"))
-        price_value = price_element.find('span', class_=re.compile("whole")).text
-        price_currency = price_element.find('span', class_=re.compile("currency")).text
-
-        price_value = float(''.join(price_value.split()))
-        price_currency = ''.join(price_currency.split())
-
         try:
+            link_element = box.find('a', href=re.compile('playstation'))
+
+            link = f"{MEDIA_EXPERT_HOST}{link_element['href']}"
+            name = link_element.text.strip()
+
+            price_element = box.find(class_=re.compile("price-box"))
+            price_value = price_element.find('span', class_=re.compile("whole")).text
+            price_currency = price_element.find('span', class_=re.compile("currency")).text
+
+            price_value = float(''.join(price_value.split()))
+            price_currency = ''.join(price_currency.split())
+
             results.append(OfferSchemaIn(
                 name=name,
                 price=price_value,
@@ -75,7 +92,9 @@ def get_media_expert_data() -> list[OfferSchemaIn] | None:
                 url=link
             ))
         except ValidationError:
-            pass
+            _logger.error(f"offer element: {box} not validated. Skipping...")
+        except BaseException as e:
+            _logger.error(f"Unexpected error for offer element: {box}.")
 
     return results
 
