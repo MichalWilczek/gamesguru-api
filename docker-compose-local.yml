@@ -17,7 +17,11 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     environment:
       - DB_HOST=postgres
-      - DB_PASSWORD=postgres
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SECRET_KEY=${DJANGO_SECRET_KEY}
+      - ENV=${ENV}
     depends_on:
       - postgres
 
@@ -27,11 +31,23 @@ services:
       - gamesguru-db-data:/var/lib/postgresql/data
       - /db/pg_hba.conf:/etc/postgresql/pg_hba.conf
     environment:
-      - POSTGRES_DB=gamesguru
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
+
+  chromedriver:
+    image: selenium/standalone-chrome:latest
+    restart: always
+    container_name: chromedriver
+    privileged: true
+    shm_size: 2g
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    volumes:
+      - /dev/shm:/dev/shm
 
 volumes:
   gamesguru-db-data:
