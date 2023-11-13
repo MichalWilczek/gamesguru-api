@@ -1,0 +1,9 @@
+[Unit]
+Description=SSL certificate renewal - periodic timer
+
+[Timer]
+OnCalendar=Friday *-*-* 00:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
