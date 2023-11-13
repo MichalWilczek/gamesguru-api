@@ -1,0 +1,6 @@
+[Unit]
+Description=SSL certificate renewal
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/renew.sh
