@@ -70,6 +70,6 @@ services:
       - DOMAIN=${DOMAIN}
     volumes:
       - certbot-web:/vol/www
-      - certbot-certs:/etc/letsencrypt/
+      - certbot-certs:/etc/letsencrypt
     depends_on:
       - proxy
