@@ -5,7 +5,6 @@ ENV PYTHONUNBUFFERED 1
 USER nonroot
 
 COPY --chown=nonroot:nonroot run.sh run.sh
-COPY --chown=nonroot:nonroot gunicorn.conf.py gunicorn.conf.py
 COPY --chown=nonroot:nonroot gamesguru gamesguru
 COPY --chown=nonroot:nonroot requirements.txt requirements.txt
 COPY --chown=nonroot:nonroot manage.py manage.py
