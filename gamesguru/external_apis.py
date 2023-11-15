@@ -94,7 +94,7 @@ def get_media_expert_data() -> list[OfferSchemaIn] | None:
         except ValidationError:
             _logger.error(f"offer element: {box} not validated. Skipping...")
         except BaseException as e:
-            _logger.error(f"Unexpected error for offer element: {box}.")
+            _logger.error(f"Unexpected error for offer element. Probably formatting not possible.")
 
     return results
 
