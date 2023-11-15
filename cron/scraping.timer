@@ -1,0 +1,9 @@
+[Unit]
+Description=Webpage scraping - periodic timer
+
+[Timer]
+OnCalendar=*-*-* 17:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
