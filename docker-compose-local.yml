@@ -38,7 +38,7 @@ services:
       - "5432:5432"
 
   chromedriver:
-    image: selenium/standalone-chrome:latest
+    image: selenium/standalone-chrome:112.0-chromedriver-112.0
     restart: always
     container_name: chromedriver
     privileged: true
@@ -48,6 +48,8 @@ services:
       - "7900:7900"
     volumes:
       - /dev/shm:/dev/shm
+    depends_on:
+      - gamesguru
 
 volumes:
   gamesguru-db-data:
