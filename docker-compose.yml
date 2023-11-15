@@ -18,7 +18,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - static:/vol/web/static
+      - static:/vol/web
       - media:/vol/web/media
     environment:
       - DB_HOST=postgres
@@ -27,6 +27,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - SECRET_KEY=${DJANGO_SECRET_KEY}
       - ENV=${ENV}
+      - STATIC_URL=/static/static/
+      - STATIC_ROOT=/vol/web/static
     depends_on:
       - postgres
 
@@ -57,6 +59,8 @@ services:
       - certbot-web:/vol/www
       - proxy-dhparams:/vol/proxy
       - certbot-certs:/etc/letsencrypt
+      - static:/vol/static
+      - media:/vol/media
     environment:
       - DOMAIN=${DOMAIN}
 

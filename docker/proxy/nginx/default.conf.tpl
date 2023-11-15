@@ -3,7 +3,7 @@ server {
     server_name ${DOMAIN} www.${DOMAIN};
 
     location /static {
-        alias /vol/web/static;
+        alias /vol/static;
     }
 
     location /.well-known/acme-challenge/ {
