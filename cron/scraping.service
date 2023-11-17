@@ -3,4 +3,4 @@ Description=Scraping routine
 
 [Service]
 Type=simple
-ExecStart=/home/ubuntu/renew.sh
+ExecStart=/home/ubuntu/scrape.sh
