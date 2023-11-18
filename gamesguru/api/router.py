@@ -21,7 +21,6 @@ async def healthz(request):
 
 @router.get("/offers", response={
     200: list[OfferSchemaOut],
-    204: Error,
     500: Error
 })
 def offers(
@@ -31,12 +30,10 @@ def offers(
         max_offers_no: int = 5
 ):
     try:
-        objs = Offer.objects.filter(
-            name__icontains=name,
+        offers = Offer.objects.filter(
+            product__name__icontains=name,
             pub_time__gte=latest_pub_date
         ).order_by("price")[:max_offers_no].select_related('shop').annotate(shop_name=F('shop__name'))
     except BaseException as e:
         return 500, {"msg": f"Unexpected error occured. Error: {e}"}
-    if len(objs) == 0:
-        return 204, {"msg": f"No data in the database from: {latest_pub_date.isoformat()}."}
-    return 200, objs
+    return 200, offers

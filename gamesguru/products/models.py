@@ -13,15 +13,41 @@ class Shop(models.Model):
     name = models.CharField(max_length=100)
     tracking_url = models.TextField(max_length=1000, default=None, blank=True)
 
+    def __str__(self):
+        return f"{self.name}"
+
+
+class ProductCategory(models.Model):
+    class Meta:
+        verbose_name = "Product Category"
+        verbose_name_plural = "Product Categories"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name}"
+
 
 class Product(models.Model):
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
+        constraints = [
+            models.UniqueConstraint(fields=["name"], name="unique_name"),
+            models.UniqueConstraint(fields=["search_name"], name="unique_search_name")
+        ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.CharField(max_length=100)
+    base_name = models.CharField(max_length=100, default=str(name))
+    search_name = models.CharField(max_length=100, default=str(name))
     epi = models.CharField(max_length=36, default=uuid.uuid4, auto_created=True)
+    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True)
+    price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Offer(models.Model):

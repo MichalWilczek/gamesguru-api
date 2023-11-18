@@ -5,13 +5,13 @@ from django.core.management.base import BaseCommand
 
 from gamesguru.products.schemas import OfferSchemaIn
 from gamesguru.products.models import Offer, Product, Shop
-from gamesguru.external_apis import get_media_expert_data
+from gamesguru.products.offers_scraping import run_scraping
 
 _logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Fetches latest playstation data from shops and saves it to the database."
+    help = "Fetches latest offers from multiple shops and saves them to the database."
 
     MEDIA_EXPERT_SHOP_NAME = "MediaExpert"
     PRODUCT_NAME = "Playstation 5"
@@ -19,40 +19,48 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> int:
         now = datetime.now(tz=timezone.utc)
 
-        _logger.info("Fetching data from Media Expert.")
-        media_expert_data = get_media_expert_data()
-        if media_expert_data:
+        _logger.info("Fetching shops and products from the database...")
+        shops = list(Shop.objects.all())
+        products = list(Product.objects.all())
 
-            try:
-                shop = Shop.objects.get(name=self.MEDIA_EXPERT_SHOP_NAME)
-            except Shop.DoesNotExist:
-                _logger.error(f"The shop '{self.MEDIA_EXPERT_SHOP_NAME}' does not exist.")
-                return 1
-
-            try:
-                product = Product.objects.get(name=self.PRODUCT_NAME)
-            except Product.DoesNotExist:
-                _logger.error(f"The product '{self.PRODUCT_NAME}' does not exist.")
-                return 1
-
-            products = self._insert_products(
-                media_expert_data,
-                shop,
-                product,
-                now
-            )
-            if products:
-                _logger.info(f"Fetched {len(products)} offers from Media Expert to the database.")
-                return 0
-            _logger.error(f"Error while saving products to the database.")
-        else:
-            _logger.warning("No data fetched from Media Expert.")
+        offers = []
+        for shop in shops:
+            _logger.info(f"Scraping shop: '{shop.name}'...")
+            for product in products:
+                _logger.info(f"Shop: '{shop.name}', scraping '{product.name}'...")
+                scraped_offers = run_scraping(shop, product)
+                processed_offers = self._filter_out_scam_offers(
+                    self._to_model_offers(scraped_offers, shop, product, now)
+                )
+                offers.extend(processed_offers)
+                _logger.info(f"Shop: {shop.name}. "
+                             f"Scraped {len(scraped_offers)} offers. Accepted: {len(processed_offers)}.")
+                db_result = Offer.objects.bulk_create(
+                    offers,
+                    update_conflicts=True,
+                    update_fields=["name", "price", "currency", "pub_time"],
+                    unique_fields=['url']
+                )
+                if db_result:
+                    _logger.info(f"Shop: {shop.name}. Offers saved to the database.")
+                else:
+                    _logger.warning(f"Shop: {shop.name}. No data saved to the database.")
 
         return 0
 
-    def _insert_products(self, products: list[OfferSchemaIn], shop: Offer, product: Product, pub_time: datetime):
+    def _filter_out_scam_offers(self, offers: list[Offer]):
+        filtered_offers = []
+        for offer in offers:
+            product = offer.product
+            if product.price_lower_limit and offer.price < product.price_lower_limit:
+                continue
+            filtered_offers.append(offer)
+        return filtered_offers
+
+    def _to_model_offers(
+            self, offers: list[OfferSchemaIn], shop: Offer, product: Product, pub_time: datetime) -> list[Offer]:
         objs = []
-        for product_data in products:
-            data = product_data.dict()
+        for offer in offers:
+            data = offer.dict()
             objs.append(Offer(shop=shop, product=product, pub_time=pub_time, **data))
-        return Offer.objects.bulk_create(objs, ignore_conflicts=True)
+        return objs
