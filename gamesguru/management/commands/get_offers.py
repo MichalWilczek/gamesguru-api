@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 _logger.info(f"Shop: {shop.name}. "
                              f"Scraped {len(scraped_offers)} offers. Accepted: {len(processed_offers)}.")
                 db_result = Offer.objects.bulk_create(
-                    offers,
+                    processed_offers,
                     update_conflicts=True,
                     update_fields=["name", "price", "currency", "pub_time"],
                     unique_fields=['url']
