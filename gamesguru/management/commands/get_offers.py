@@ -35,25 +35,34 @@ class Command(BaseCommand):
                 offers.extend(processed_offers)
                 _logger.info(f"Shop: {shop.name}. "
                              f"Scraped {len(scraped_offers)} offers. Accepted: {len(processed_offers)}.")
-                db_result = Offer.objects.bulk_create(
-                    processed_offers,
-                    update_conflicts=True,
-                    update_fields=["name", "price", "currency", "pub_time"],
-                    unique_fields=['url']
-                )
-                if db_result:
-                    _logger.info(f"Shop: {shop.name}. Offers saved to the database.")
-                else:
-                    _logger.warning(f"Shop: {shop.name}. No data saved to the database.")
+
+                try:
+                    db_result = Offer.objects.bulk_create(
+                        processed_offers,
+                        update_conflicts=True,
+                        update_fields=["name", "price", "currency", "url", "pub_time", "shop", "product"],
+                        unique_fields=['url']
+                    )
+                    if db_result:
+                        _logger.info(f"Shop: {shop.name}. Offers saved to the database.")
+                    else:
+                        _logger.warning(f"Shop: {shop.name}. No data saved to the database.")
+                except BaseException as e:
+                    _logger.error(f"Unexpected error occurred: {e}")
 
         return 0
 
     def _filter_out_scam_offers(self, offers: list[Offer]):
         filtered_offers = []
+        urls = []
         for offer in offers:
             product = offer.product
             if product.price_lower_limit and offer.price < product.price_lower_limit:
                 continue
+            if offer.url in urls:
+                continue
+            else:
+                urls.append(offer.url)
             filtered_offers.append(offer)
         return filtered_offers
 
