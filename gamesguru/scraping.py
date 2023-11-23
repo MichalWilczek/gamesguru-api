@@ -19,14 +19,21 @@ def get_url_data(url: str) -> str:
     options.add_argument('--ignore-certificate-errors')
 
     # Try to connect to the running container 'chromedriver' through the docker network.
-    # The other option is for debugging purposes when the service is not running in the container.
     try:
         driver = webdriver.Remote(
             command_executor='http://chromedriver:4444/wd/hub',
             options=options
         )
+
+    # Other options mostly for debugging purposes.
     except urllib3.exceptions.MaxRetryError:
-        driver = webdriver.Chrome()
+        try:
+            driver = webdriver.Remote(
+                command_executor='http://127.0.0.1:4444/wd/hub',
+                options=options
+            )
+        except urllib3.exceptions.MaxRetryError:
+            driver = webdriver.Chrome()
 
     driver.get(url)
     time.sleep(2)

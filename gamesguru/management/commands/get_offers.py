@@ -25,9 +25,9 @@ class Command(BaseCommand):
 
         offers = []
         for shop in shops:
-            _logger.info(f"Scraping shop: '{shop.name}'...")
+            _logger.info(f"Scraping shop: {shop.name}...")
             for product in products:
-                _logger.info(f"Shop: '{shop.name}', scraping '{product.name}'...")
+                _logger.info(f"Shop: {shop.name}, scraping {product.name}...")
                 scraped_offers = run_scraping(shop, product)
                 processed_offers = self._filter_out_scam_offers(
                     self._to_model_offers(scraped_offers, shop, product, now)
