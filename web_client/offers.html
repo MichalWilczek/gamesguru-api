@@ -32,7 +32,13 @@
             }
         };
 
-        const createWidget = (textContent, widgetClasses) => {
+        const createParagraph = (textContent) => {
+            const paragraph = document.createElement('p');
+            paragraph.textContent = textContent;
+            return paragraph;
+        }
+
+        const createWidget = (innerElement, widgetClasses) => {
             const div = document.createElement('div');
             div.classList.add(...['elementor-element', 'elementor-widget', 'elementor-widget-text-editor']);
             div.classList.add(...widgetClasses);
@@ -45,12 +51,9 @@
             const subSubDiv = document.createElement('div');
             subSubDiv.classList.add(...['elementor-text-editor', 'elementor-clearfix']);
 
-            if (textContent !== null) {
-                const paragraph = document.createElement('p');
-                paragraph.textContent = textContent;
-                subSubDiv.append(paragraph);
+            if (innerElement !== null) {
+                subSubDiv.append(innerElement);   
             }
-
             subDiv.append(subSubDiv);
             div.append(subDiv);
 
@@ -83,11 +86,26 @@
                 const linkDiv = document.createElement('div');
                 linkDiv.classList.add('e-con-inner');
 
-                const nameDiv = createWidget(offer['name'], ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul']);
-                const priceDiv = createWidget(`${offer['price']} ${offer['currency']}`, ['elementor-element-6a0067ff', 'lista-produkt-cena']);
-                const shopDiv = createWidget(offer['shop_name'], ['elementor-element-5aaec845', 'lista-produkt-rabat']);
-                const smallUrlDiv = createWidget(null, ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta']);
-
+                const nameDiv = createWidget(
+                    createParagraph(offer['name']), 
+                    ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul']
+                );
+                const priceDiv = createWidget(
+                    createParagraph(`${offer['price']} ${offer['currency']}`), 
+                    ['elementor-element-6a0067ff', 'lista-produkt-cena']
+                );
+                const shopDiv = createWidget(
+                    createParagraph(offer['shop_name']), 
+                    ['elementor-element-5aaec845', 'lista-produkt-rabat']
+                );
+                
+                const iElement = document.createElement('i');
+                iElement.classList.add(...['fas', 'fa-link']);
+                const smallUrlDiv = createWidget(
+                    iElement, 
+                    ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta']
+                );
+                
                 linkDiv.append(nameDiv);
                 linkDiv.append(priceDiv);
                 linkDiv.append(shopDiv);
