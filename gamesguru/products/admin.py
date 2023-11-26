@@ -17,14 +17,14 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    search_fields = ['id', 'name']
+    search_fields = ['id', 'name', 'base_name', 'search_name']
     readonly_fields = ('id',)
     list_display = ['name', 'epi', 'category', 'price_lower_limit', 'base_name', 'search_name']
     ordering = ('-name', )
 
 
 class OfferAdmin(admin.ModelAdmin):
-    search_fields = ['id', 'name']
+    search_fields = ['id', 'name', 'price', 'currency', 'pub_time', 'product__name', 'shop__name']
     readonly_fields = ('id',)
     list_display = ['name', 'price', 'currency', 'url', 'affiliation_url', 'pub_time', 'product', 'shop']
     ordering = ('-pub_time', )

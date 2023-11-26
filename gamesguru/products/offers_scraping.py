@@ -182,4 +182,4 @@ def get_prices(box, metadata: ShopMetadata) -> tuple:
 
 
 def remove_ascii_characters(txt: str) -> str:
-    return re.sub(r'[^\x00-\x7F]+', ' ', txt)
+    return txt.replace('\x00', ' ')

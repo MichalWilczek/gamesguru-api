@@ -26,4 +26,5 @@ class OfferSchemaOut(Schema):
     price: float
     currency: str
     shop_name: str
+    url: str
     affiliation_url: str
