@@ -26,13 +26,13 @@ async def healthz(request):
 def offers(
         request,
         name: str,
-        latest_pub_date: datetime = datetime.now(timezone.utc) - timedelta(days=30),
+        timedelta_days: int = 5,
         max_offers_no: int = 5
 ):
     try:
         offers = Offer.objects.filter(
             product__name__icontains=name,
-            pub_time__gte=latest_pub_date
+            pub_time__gte=datetime.now(timezone.utc) - timedelta(days=timedelta_days)
         ).order_by("price")[:max_offers_no].select_related('shop').annotate(shop_name=F('shop__name'))
     except BaseException as e:
         return 500, {"msg": f"Unexpected error occured. Error: {e}"}

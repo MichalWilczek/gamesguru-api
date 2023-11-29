@@ -18,53 +18,61 @@ class ShopMetadata:
 
 
 class MediaExpert(ShopMetadata):
-    host = "https://www.mediaexpert.pl"
-    url = f"{host}/search?query[menu_item]=&query[querystring]"
+    host = "www.mediaexpert.pl"
+    url = "https://{host}/search?query[menu_item]=&query[querystring]={search_name}"
     offer_box_name = "offer-box"
     name_element_name = None
     price_box_name = "price-box"
     price_value_name = "whole"
     price_currency_name = "currency"
+    basket_text = "do koszyka"
 
 
 class RTVEuroAGD(ShopMetadata):
     host = "www.euro.com.pl"
-    url = f"https://{host}/search.bhtml?keyword"
+    url = "https://{host}/search.bhtml?keyword={search_name}"
+    # url = "https://{host}/search,a1.bhtml?keyword={search_name}"  # a1 - tylko dostępne w internecie
     offer_box_name = "box-medium"
     name_element_name = None
     price_box_name = "box-medium__price"
     price_value_name = "price-template__large--total"
     price_currency_name = "price-template__large--currency"
+    basket_text = "do koszyka"
 
 
 class MediaMarkt(ShopMetadata):
     host = "mediamarkt.pl"
-    url = f"https://{host}/search?query%5Bmenu_item%5D=&query%5Bquerystring%5D"
+    url = "https://{host}/search?query%5Bmenu_item%5D=&query%5Bquerystring%5D={search_name}"
     offer_box_name = "offer"
     name_element_name = None
     price_box_name = "price-box"
     price_value_name = "whole"
     price_currency_name = "currency"
+    basket_text = "do koszyka"
 
 
 class NeoNet(ShopMetadata):
     host = "www.neonet.pl"
-    url = f"https://{host}/search.html?order=score&query"
+    url = "https://{host}/search.html?order=score&query={search_name}"
+    # url = "https://{host}/search.html?order=score&query={search_name}&dostepnosc=do_24h"
     offer_box_name = "listingItemScss-root"
     name_element_name = "listingItemHeaderScss-name_limit"
     price_box_name = "uiPriceScss-price"
     price_value_name = "uiPriceScss-integer"
     price_currency_name = "uiPriceScss-currency"
+    basket_text = "do koszyka"
 
 
 class Empik(ShopMetadata):
     host = "www.empik.com"
-    url = f"https://{host}/szukaj/produkt?q"
+    url = "https://{host}/szukaj/produkt?q={search_name}"
+    # url = "https://{host}/szukaj/produkt?q={search_name}&availabilityLabel=do+72h"
     offer_box_name = "search-list-item"
     name_element_name = None
     price_box_name = "price ta-price-tile"
     price_value_name = None
     price_currency_name = None
+    basket_text = "do koszyka"
 
 
 class OleOle(ShopMetadata):
@@ -76,12 +84,13 @@ class OleOle(ShopMetadata):
     price_box_name = None
     price_value_name = None
     price_currency_name = None
+    basket_text = None
 
 
 class ShopEnum(str, Enum):
     empik = 'Empik'
-    media_expert = 'MediaExpert'
-    media_markt = 'Media Markt'
+    media_expert = 'Media Expert'
+    media_markt = 'MediaMarkt'
     neonet = 'Neonet'
     ole_ole = 'OleOle'
     rtv_euro_agd = 'RTV EURO AGD'
@@ -112,8 +121,11 @@ def run_scraping(shop: Shop, product: Product) -> list[OfferSchemaIn] | None:
 
 def scrap_offers(product: Product, metadata: ShopMetadata):
     try:
-        search_name = quote(f"{product.category.name} {product.search_name}")
-        soup = scrap_webpage(f"{metadata.url}={search_name}")
+        url = metadata.url.format(
+            host=metadata.host,
+            search_name=quote(product.search_name)
+        )
+        soup = scrap_webpage(url)
         offers = soup.find_all(class_=re.compile(metadata.offer_box_name))
     except BaseException as e:
         _logger.error(f"Unexpected error while querying chromedriver. Skipping. Error: {e}")
@@ -127,6 +139,10 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
 
             name = get_offer_name(box, link_element, metadata)
             price_value, price_currency = get_prices(box, metadata)
+
+            basket_name = box.find(string=re.compile(metadata.basket_text, re.IGNORECASE)).strip()
+            if not basket_name:
+                continue
 
             results.append(OfferSchemaIn(
                 name=name,

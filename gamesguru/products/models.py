@@ -17,18 +17,6 @@ class Shop(models.Model):
         return f"{self.name}"
 
 
-class ProductCategory(models.Model):
-    class Meta:
-        verbose_name = "Product Category"
-        verbose_name_plural = "Product Categories"
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f"{self.name}"
-
-
 class Product(models.Model):
     class Meta:
         verbose_name = "Product"
@@ -43,7 +31,6 @@ class Product(models.Model):
     base_name = models.CharField(max_length=100, default=str(name))
     search_name = models.CharField(max_length=100, default=str(name))
     epi = models.CharField(max_length=36, default=uuid.uuid4, auto_created=True)
-    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True)
     price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
 
     def __str__(self):
