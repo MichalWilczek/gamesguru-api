@@ -1,3 +1,4 @@
+import re
 import uuid
 import urllib.parse
 
@@ -30,8 +31,18 @@ class Product(models.Model):
     name = models.CharField(max_length=100)
     base_name = models.CharField(max_length=100, default=str(name))
     search_name = models.CharField(max_length=100, default=str(name))
+    search_words_to_exclude = models.TextField(max_length=1000, default=None, blank=True)
+    search_words_to_include = models.TextField(max_length=1000, default=None, blank=True)
     epi = models.CharField(max_length=36, default=uuid.uuid4, auto_created=True)
     price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
+
+    @property
+    def search_words_to_exclude_list(self) -> list[str]:
+        return re.split(r',', str(self.search_words_to_exclude))
+
+    @property
+    def search_words_to_include_list(self) -> list[str]:
+        return re.split(r',', str(self.search_words_to_include))
 
     def __str__(self):
         return f"{self.name}"

@@ -12,7 +12,7 @@ class ShopAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name', 'base_name', 'search_name']
     readonly_fields = ('id',)
-    list_display = ['name', 'epi', 'price_lower_limit', 'base_name', 'search_name']
+    list_display = ['name', 'epi', 'price_lower_limit', 'base_name', 'search_name', 'search_words_to_exclude', 'search_words_to_include']
     ordering = ('-name', )
 
 

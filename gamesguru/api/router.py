@@ -26,7 +26,7 @@ async def healthz(request):
 def offers(
         request,
         name: str,
-        timedelta_days: int = 5,
+        timedelta_days: int = 2,
         max_offers_no: int = 5
 ):
     try:
