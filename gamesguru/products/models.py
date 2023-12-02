@@ -38,11 +38,13 @@ class Product(models.Model):
 
     @property
     def search_words_to_exclude_list(self) -> list[str]:
-        return re.split(r',', str(self.search_words_to_exclude))
+        elements = re.split(r',', str(self.search_words_to_exclude))
+        return [element for element in elements if element]
 
     @property
     def search_words_to_include_list(self) -> list[str]:
-        return re.split(r',', str(self.search_words_to_include))
+        elements = re.split(r',', str(self.search_words_to_include))
+        return [element for element in elements if element]
 
     def __str__(self):
         return f"{self.name}"

@@ -140,7 +140,7 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             name = get_offer_name(box, link_element, metadata)
             if any(word.lower() in name.lower() for word in product.search_words_to_exclude_list):
                 continue
-            if any(word.lower() not in name.lower() for word in product.search_words_to_include_list):
+            if not any(word.lower() in name.lower() for word in product.search_words_to_include_list):
                 continue
 
             price_value, price_currency = get_prices(box, metadata)
