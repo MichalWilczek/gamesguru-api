@@ -19,7 +19,7 @@ class ProductAdmin(admin.ModelAdmin):
 class OfferAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name', 'price', 'currency', 'pub_time', 'product__name', 'shop__name']
     readonly_fields = ('id',)
-    list_display = ['name', 'price', 'currency', 'url', 'affiliation_url', 'pub_time', 'product', 'shop']
+    list_display = ['name', 'price', 'currency', 'pub_time', 'state', 'state_check_time', 'url', 'affiliation_url', 'product', 'shop']
     ordering = ('-pub_time', '-price')
 
 

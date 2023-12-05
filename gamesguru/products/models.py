@@ -3,6 +3,8 @@ import uuid
 import urllib.parse
 
 from django.db import models
+from django.utils.translation import gettext_lazy
+from django.utils import timezone
 
 
 class Shop(models.Model):
@@ -50,6 +52,12 @@ class Product(models.Model):
         return f"{self.name}"
 
 
+class OfferState(models.TextChoices):
+    NOT_CHECKED = 'not checked', gettext_lazy('Not Checked')
+    OUTDATED = 'outdated', gettext_lazy('Outdated')
+    VALID = 'valid', gettext_lazy('Valid')
+
+
 class Offer(models.Model):
     class Meta:
         verbose_name = "Offer"
@@ -64,6 +72,8 @@ class Offer(models.Model):
     currency = models.CharField(max_length=20)
     url = models.TextField(max_length=1000)
     pub_time = models.DateTimeField("Publication time")
+    state = models.CharField(choices=OfferState.choices, max_length=16, default=OfferState.NOT_CHECKED)
+    state_check_time = models.DateTimeField("State check time", blank=True, default=timezone.now)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 

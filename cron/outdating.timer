@@ -1,0 +1,9 @@
+[Unit]
+Description=Webpage offer outdating routine - periodic timer
+
+[Timer]
+OnCalendar=*-*-* *:15/2
+Persistent=true
+
+[Install]
+WantedBy=timers.target

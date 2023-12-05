@@ -6,7 +6,7 @@ from urllib.parse import quote
 from pydantic import ValidationError
 
 from gamesguru.scraping import scrap_webpage
-from .models import Shop, Product
+from .models import Shop, Product, Offer
 from .schemas import OfferSchemaIn
 
 
@@ -96,27 +96,52 @@ class ShopEnum(str, Enum):
     rtv_euro_agd = 'RTV EURO AGD'
 
 
-def run_scraping(shop: Shop, product: Product) -> list[OfferSchemaIn] | None:
+def get_metadata(shop: Shop) -> ShopMetadata | None:
     try:
         match shop.name:
             case ShopEnum.empik.value:
-                return scrap_offers(product, Empik())
+                return Empik()
             case ShopEnum.media_expert.value:
-                return scrap_offers(product, MediaExpert())
+                return MediaExpert()
             case ShopEnum.media_markt.value:
-                return scrap_offers(product, MediaMarkt())
+                return MediaMarkt()
             case ShopEnum.neonet.value:
-                return scrap_offers(product, NeoNet())
+                return NeoNet()
             case ShopEnum.rtv_euro_agd.value:
-                return scrap_offers(product, RTVEuroAGD())
+                return RTVEuroAGD()
             case other:
                 raise NameError()
-
     except NameError:
-        _logger.error(f"Shop: {shop.name} does not have any searching algorithm implemented. Skipping.")
+        _logger.error(f"Shop: {shop.name} not implemented. Skipping.")
+    except BaseException:
+        _logger.warning(f'Shop: {shop.name}. Unexpected error. Skipping.')
+
+
+def run_scraping(shop: Shop, product: Product) -> list[OfferSchemaIn] | None:
+    metadata = get_metadata(shop)
+    if metadata is None:
+        _logger.error(f"Shop: {shop.name} does not have any scraping algorithm implemented. Skipping.")
         return []
+    try:
+        return scrap_offers(product, metadata)
     except BaseException:
         _logger.warning(f'Shop: {shop.name}, Product: {product.name}. Unexpected error. Skipping.')
+
+
+def scrap_offer_for_validity(offer: Offer) -> bool | None:
+    metadata = get_metadata(offer.shop)
+    if metadata is None:
+        _logger.error(f"Shop: {offer.shop.name} does not have any scraping algorithm implemented. Skipping.")
+        return
+
+    url = offer.url
+    if 'https://' not in url:
+        url = f'https://{url}'
+    soup = scrap_webpage(url)
+    basket_name = soup.find(string=re.compile(metadata.basket_text, re.IGNORECASE))
+    if basket_name and len(basket_name) < 200:
+        return True
+    return False
 
 
 def scrap_offers(product: Product, metadata: ShopMetadata):

@@ -1,0 +1,6 @@
+[Unit]
+Description=Offer outdating routine
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/outdate.sh

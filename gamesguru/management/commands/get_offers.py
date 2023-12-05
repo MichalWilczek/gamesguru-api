@@ -13,9 +13,6 @@ _logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = "Fetches latest offers from multiple shops and saves them to the database."
 
-    MEDIA_EXPERT_SHOP_NAME = "MediaExpert"
-    PRODUCT_NAME = "Playstation 5"
-
     def handle(self, *args, **options) -> int:
         now = datetime.now(tz=timezone.utc)
 
