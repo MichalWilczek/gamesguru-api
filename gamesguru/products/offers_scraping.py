@@ -72,7 +72,7 @@ class Empik(ShopMetadata):
     price_box_name = "price ta-price-tile"
     price_value_name = None
     price_currency_name = None
-    basket_text = "do koszyka"
+    basket_text = "Dodaj do koszyka"
 
 
 class OleOle(ShopMetadata):

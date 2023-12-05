@@ -16,21 +16,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> int:
         now = datetime.now(tz=timezone.utc)
 
-        _logger.info("Fetching shops and products from the database...")
         shops = list(Shop.objects.all())
         products = list(Product.objects.all())
-
         offers = []
         for shop in shops:
-            _logger.info(f"Scraping shop: {shop.name}...")
             for product in products:
-                _logger.info(f"Shop: {shop.name}, scraping {product.name}...")
                 scraped_offers = run_scraping(shop, product)
                 processed_offers = self._filter_out_scam_offers(
                     self._to_model_offers(scraped_offers, shop, product, now)
                 )
                 offers.extend(processed_offers)
-                _logger.info(f"Shop: {shop.name}. "
+                _logger.info(f"Shop: {shop.name}. Product: {product.name}. "
                              f"Scraped {len(scraped_offers)} offers. Accepted: {len(processed_offers)}.")
 
                 try:
@@ -40,9 +36,7 @@ class Command(BaseCommand):
                         update_fields=["name", "price", "currency", "url", "pub_time", "shop", "product"],
                         unique_fields=['url']
                     )
-                    if db_result:
-                        _logger.info(f"Shop: {shop.name}. Offers saved to the database.")
-                    else:
+                    if (not db_result) and len(processed_offers) > 0:
                         _logger.warning(f"Shop: {shop.name}. No data saved to the database.")
                 except BaseException as e:
                     _logger.error(f"Unexpected error occurred: {e}")

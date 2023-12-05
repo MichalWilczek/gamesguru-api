@@ -19,8 +19,6 @@ class Command(BaseCommand):
         products = Product.objects.all()
 
         for product in products:
-            _logger.info(f"Product: {product.name}, fetching the cheapest offers...")
-
             offers = Offer.objects.filter(
                 product=product,
                 state__in=[OfferState.VALID, OfferState.NOT_CHECKED],
