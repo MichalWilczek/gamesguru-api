@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Scraping configuration
-OFFERS_TIMEDELTA_DAYS = 5
+OFFERS_TIMEDELTA_DAYS = 3
 MAX_OFFERS_NO = 5
 
 # Quick-start development settings - unsuitable for production

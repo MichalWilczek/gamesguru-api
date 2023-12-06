@@ -14,14 +14,16 @@ _logger = logging.getLogger(__name__)
 
 
 class ShopMetadata:
-    pass
+    name_element_name = None
+    price_value_name = None
+    price_currency_name = None
+    scraping_ignore_basket = False
 
 
 class MediaExpert(ShopMetadata):
     host = "www.mediaexpert.pl"
     url = "https://{host}/search?query[menu_item]=&query[querystring]={search_name}"
     offer_box_name = "offer-box"
-    name_element_name = None
     price_box_name = "price-box"
     price_value_name = "whole"
     price_currency_name = "currency"
@@ -31,9 +33,7 @@ class MediaExpert(ShopMetadata):
 class RTVEuroAGD(ShopMetadata):
     host = "www.euro.com.pl"
     url = "https://{host}/search.bhtml?keyword={search_name}"
-    # url = "https://{host}/search,a1.bhtml?keyword={search_name}"  # a1 - tylko dostępne w internecie
     offer_box_name = "box-medium"
-    name_element_name = None
     price_box_name = "box-medium__price"
     price_value_name = "price-template__large--total"
     price_currency_name = "price-template__large--currency"
@@ -44,7 +44,6 @@ class MediaMarkt(ShopMetadata):
     host = "mediamarkt.pl"
     url = "https://{host}/search?query%5Bmenu_item%5D=&query%5Bquerystring%5D={search_name}"
     offer_box_name = "offer"
-    name_element_name = None
     price_box_name = "price-box"
     price_value_name = "whole"
     price_currency_name = "currency"
@@ -54,7 +53,6 @@ class MediaMarkt(ShopMetadata):
 class NeoNet(ShopMetadata):
     host = "www.neonet.pl"
     url = "https://{host}/search.html?order=score&query={search_name}"
-    # url = "https://{host}/search.html?order=score&query={search_name}&dostepnosc=do_24h"
     offer_box_name = "listingItemScss-root"
     name_element_name = "listingItemHeaderScss-name_limit"
     price_box_name = "uiPriceScss-price"
@@ -66,25 +64,20 @@ class NeoNet(ShopMetadata):
 class Empik(ShopMetadata):
     host = "www.empik.com"
     url = "https://{host}/szukaj/produkt?q={search_name}"
-    # url = "https://{host}/szukaj/produkt?q={search_name}&availabilityLabel=do+72h"
     offer_box_name = "search-list-item"
-    name_element_name = None
     price_box_name = "price ta-price-tile"
-    price_value_name = None
-    price_currency_name = None
     basket_text = "Dodaj do koszyka"
 
 
 class OleOle(ShopMetadata):
     host = "www.oleole.pl"
-    url = f"https://{host}/search.bhtml?keyword"
-    # TODO: Add configuration
-    offer_box_name = "box-medium"
-    name_element_name = None
-    price_box_name = None
-    price_value_name = None
-    price_currency_name = None
-    basket_text = None
+    url = "https://{host}/search,a1.bhtml?keyword={search_name}"
+    offer_box_name = "product-box"
+    price_box_name = "price-list"
+    price_value_name = "total"
+    price_currency_name = "currency"
+    scraping_ignore_basket = True
+    basket_text = "Do koszyka"
 
 
 class ShopEnum(str, Enum):
@@ -109,6 +102,8 @@ def get_metadata(shop: Shop) -> ShopMetadata | None:
                 return NeoNet()
             case ShopEnum.rtv_euro_agd.value:
                 return RTVEuroAGD()
+            case ShopEnum.ole_ole.value:
+                return OleOle()
             case other:
                 raise NameError()
     except NameError:
@@ -165,13 +160,15 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             name = get_offer_name(box, link_element, metadata)
             if any(word.lower() in name.lower() for word in product.search_words_to_exclude_list):
                 continue
-            if not any(word.lower() in name.lower() for word in product.search_words_to_include_list):
+            if (product.search_words_to_include_list
+                    and (not any(word.lower() in name.lower() for word in product.search_words_to_include_list))):
                 continue
 
             price_value, price_currency = get_prices(box, metadata)
-            basket_name = box.find(string=re.compile(metadata.basket_text, re.IGNORECASE)).strip()
-            if not basket_name:
-                continue
+            if not metadata.scraping_ignore_basket:
+                basket_name = box.find(string=re.compile(metadata.basket_text, re.IGNORECASE)).strip()
+                if not basket_name:
+                    continue
 
             results.append(OfferSchemaIn(
                 name=name,
