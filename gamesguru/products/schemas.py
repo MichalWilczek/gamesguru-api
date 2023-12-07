@@ -23,7 +23,7 @@ class OfferSchemaIn(ModelSchema):
 
 class OfferSchemaOut(Schema):
     name: str
-    price: float
+    price: int
     currency: str
     shop_name: str
     url: str
