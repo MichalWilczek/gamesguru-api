@@ -2,7 +2,7 @@
 Description=Webpage offer outdating routine - periodic timer
 
 [Timer]
-OnCalendar=*-*-* *:15/2
+OnCalendar=*-*-* 00,02,04,06,08,10,12,14,16,18,20,22:15:00
 Persistent=true
 
 [Install]

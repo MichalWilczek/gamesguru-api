@@ -2,8 +2,7 @@
 Description=Webpage scraping - periodic timer
 
 [Timer]
-OnCalendar=*-*-* 12:00:00
-OnCalendar=*-*-* 00:00:00
+OnCalendar=*-*-* 00,12:00:00
 Persistent=true
 
 [Install]
