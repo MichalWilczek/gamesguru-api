@@ -32,7 +32,7 @@ def offers(
 ):
     try:
         offers = Offer.objects.filter(
-            product__name__icontains=name,
+            product__name__iexact=name,
             state__in=[OfferState.VALID, OfferState.NOT_CHECKED],
             pub_time__gte=datetime.now(timezone.utc) - timedelta(days=timedelta_days)
         ).order_by("price")[:max_offers_no].select_related('shop').annotate(shop_name=F('shop__name'))
