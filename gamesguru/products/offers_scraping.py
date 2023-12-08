@@ -158,10 +158,7 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             link = f"{metadata.host}{link_element['href']}"
 
             name = get_offer_name(box, link_element, metadata)
-            if any(word.lower() in name.lower() for word in product.search_words_to_exclude_list):
-                continue
-            if (product.search_words_to_include_list
-                    and (not any(word.lower() in name.lower() for word in product.search_words_to_include_list))):
+            if not is_name_valid(name, product):
                 continue
 
             price_value, price_currency = get_prices(box, metadata)
@@ -198,6 +195,28 @@ def get_offer_name(box, link_element, metadata: ShopMetadata) -> str:
         raise ValueError()
 
     return name
+
+
+def is_name_valid(name: str, product: Product) -> bool:
+    if product.search_words_any_to_exclude_list:
+        found_any_word_to_exclude = any(
+            word.lower() in name.lower() for word in product.search_words_any_to_exclude_list)
+        if found_any_word_to_exclude:
+            return False
+
+    if product.search_words_any_to_include_list:
+        found_all_words_to_include = any(
+            word.lower() in name.lower() for word in product.search_words_any_to_include_list)
+        if not found_all_words_to_include:
+            return False
+
+    if product.search_words_all_to_include_list:
+        found_all_words_to_include = all(
+            word.lower() in name.lower() for word in product.search_words_all_to_include_list)
+        if not found_all_words_to_include:
+            return False
+
+    return True
 
 
 def get_prices(box, metadata: ShopMetadata) -> tuple:
