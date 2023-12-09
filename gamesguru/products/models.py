@@ -15,6 +15,7 @@ class Shop(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.CharField(max_length=100)
     tracking_url = models.TextField(max_length=1000, default=None, blank=True)
+    show_on_smartphones = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name}"
