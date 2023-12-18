@@ -33,7 +33,8 @@ class Command(BaseCommand):
                     db_result = Offer.objects.bulk_create(
                         processed_offers,
                         update_conflicts=True,
-                        update_fields=["name", "price", "currency", "url", "pub_time", "shop", "product"],
+                        update_fields=["name", "price", "currency", "url", "pub_time",
+                                       "state", "state_check_time", "shop", "product"],
                         unique_fields=['url']
                     )
                     if (not db_result) and len(processed_offers) > 0:
