@@ -20,7 +20,13 @@ class Command(BaseCommand):
         products = list(Product.objects.all())
         offers = []
         for shop in shops:
+            if not shop.scrape:
+                continue
+
             for product in products:
+                if not product.scrape:
+                    continue
+
                 scraped_offers = run_scraping(shop, product)
                 processed_offers = self._filter_out_scam_offers(
                     self._to_model_offers(scraped_offers, shop, product, now)

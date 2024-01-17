@@ -1,3 +1,4 @@
+ENABLE_ADMIN = True
 ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
    'https://gamesguru.pl',

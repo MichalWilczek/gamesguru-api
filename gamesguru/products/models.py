@@ -1,7 +1,7 @@
-import re
 import uuid
 
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy
 from django.utils import timezone
 
@@ -29,6 +29,7 @@ class Shop(models.Model):
     )
     tracking_url = models.TextField(max_length=1000, default=None, blank=True)
     show_on_smartphones = models.BooleanField(default=True)
+    scrape = models.BooleanField(default=True)
 
     @property
     def affiliation_obj(self):
@@ -48,33 +49,39 @@ class Product(models.Model):
         verbose_name_plural = "Products"
         constraints = [
             models.UniqueConstraint(fields=["name"], name="unique_name"),
-            models.UniqueConstraint(fields=["search_name"], name="unique_search_name")
+            models.UniqueConstraint(fields=["epi"], name="unique_epi"),
         ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.CharField(max_length=100)
-    base_name = models.CharField(max_length=100, default=str(name))
-    search_name = models.CharField(max_length=100, default=str(name))
-    search_words_any_to_exclude = models.TextField(max_length=1000, blank=True)
-    search_words_any_to_include = models.TextField(max_length=1000, blank=True)
-    search_words_all_to_include = models.TextField(max_length=1000, blank=True)
+    base_names = ArrayField(
+        base_field=models.CharField(max_length=100, default=str(name)),
+        default=list,
+        blank=True
+    )
+    search_names = ArrayField(
+        base_field=models.CharField(max_length=100, default=str(name)),
+        default=list,
+        blank=True
+    )
+    search_words_any_to_exclude = ArrayField(
+        models.CharField(max_length=1000, blank=True),
+        default=list,
+        blank=True
+    )
+    search_words_any_to_include = ArrayField(
+        models.CharField(max_length=1000, blank=True),
+        default=list,
+        blank=True
+    )
+    search_words_all_to_include = ArrayField(
+        models.CharField(max_length=1000, blank=True),
+        default=list,
+        blank=True
+    )
     epi = models.CharField(max_length=32, default=generate_random_string, auto_created=True)
     price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
-
-    @property
-    def search_words_any_to_exclude_list(self) -> list[str]:
-        elements = re.split(r',', str(self.search_words_any_to_exclude))
-        return [element for element in elements if element]
-
-    @property
-    def search_words_any_to_include_list(self) -> list[str]:
-        elements = re.split(r',', str(self.search_words_any_to_include))
-        return [element for element in elements if element]
-
-    @property
-    def search_words_all_to_include_list(self) -> list[str]:
-        elements = re.split(r',', str(self.search_words_all_to_include))
-        return [element for element in elements if element]
+    scrape = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name}"
