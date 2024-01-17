@@ -56,56 +56,62 @@
         const containerInner = document.createElement('div');
         containerInner.classList.add('elementor-inner');
 
-        const sectionWrap = document.createElement('div');
-        sectionWrap.classList.add('e-con-inner');
+        if (offers.length === 0) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.textContent = 'Obecnie ta konsola nie jest dostępna w żadnym ze śledzonych przez nas sklepów. Wróć tu za jakiś czas, by sprawdzić nowe oferty';
+            emptyDiv.classList.add('empty-div');
+            containerInner.append(emptyDiv);
 
-        for (let offer of offers) {
+        } else {
+            const sectionWrap = document.createElement('div');
+            sectionWrap.classList.add('lista');
 
-            const link = document.createElement('a');
-            link.classList.add(...['elementor-element', 'elementor-element-1cb18cc5', 'lista-produkt-kafel', 'e-con-boxed', 'e-flex', 'e-con']);
-            link.dataset.element_type = 'container';
-            link.dataset.settings = '{&quot;content_width&quot;:&quot;boxed&quot;}';
-            link.dataset.non_affiliated_url = offer['url'];
-            link.href = offer['affiliation_url'];
-            link.rel = 'nofollow noindex sponsored noreferrer noopener';
-            link.target = '_blank';
+            for (let offer of offers) {
 
-            const linkDiv = document.createElement('div');
-            linkDiv.classList.add('e-con-inner');
+                const link = document.createElement('a');
+                link.classList.add(...['elementor-element', 'elementor-element-1cb18cc5', 'e-con-boxed', 'e-flex', 'e-con', 'lista-link']);
+                link.dataset.element_type = 'container';
+                link.dataset.settings = '{&quot;content_width&quot;:&quot;boxed&quot;}';
+                link.dataset.non_affiliated_url = offer['url'];
+                link.href = offer['affiliation_url'];
+                link.rel = 'nofollow noindex sponsored noreferrer noopener';
+                link.target = '_blank';
 
-            const nameDiv = createWidget(
-                createParagraph(offer['name']),
-                ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul']
-            );
-            const priceDiv = createWidget(
-                createParagraph(`${offer['price']} ${offer['currency']}`),
-                ['elementor-element-6a0067ff', 'lista-produkt-cena']
-            );
-            const shopDiv = createWidget(
-                createParagraph(offer['shop_name']),
-                ['elementor-element-5aaec845', 'lista-produkt-rabat']
-            );
+                const linkDiv = document.createElement('div');
+                linkDiv.classList.add('lista-produkt');
 
-            const iElement = document.createElement('i');
-            iElement.classList.add(...['fas', 'fa-link']);
-            const smallUrlDiv = createWidget(
-                iElement,
-                ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta']
-            );
+                const nameDiv = createWidget(
+                    createParagraph(offer['name']),
+                    ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul']
+                );
+                const priceDiv = createWidget(
+                    createParagraph(`${offer['price']} ${offer['currency']}`),
+                    ['elementor-element-6a0067ff', 'lista-produkt-cena']
+                );
+                const shopDiv = createWidget(
+                    createParagraph(offer['shop_name']),
+                    ['elementor-element-5aaec845', 'lista-produkt-rabat']
+                );
 
-            linkDiv.append(nameDiv);
-            linkDiv.append(priceDiv);
-            linkDiv.append(shopDiv);
-            linkDiv.append(smallUrlDiv);
+                const iElement = document.createElement('i');
+                iElement.classList.add(...['fas', 'fa-link']);
+                const smallUrlDiv = createWidget(
+                    iElement,
+                    ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta']
+                );
 
-            link.append(linkDiv);
-            sectionWrap.append(link);
+                linkDiv.append(nameDiv);
+                linkDiv.append(priceDiv);
+                linkDiv.append(shopDiv);
+                linkDiv.append(smallUrlDiv);
+
+                link.append(linkDiv);
+                sectionWrap.append(link);
+            }
+            containerInner.append(sectionWrap);
         }
 
-        containerInner.append(sectionWrap);
         container.append(containerInner);
-
-        // Append the table to the container div
         script.parentElement.insertBefore(container, script);
     }
 </script>
