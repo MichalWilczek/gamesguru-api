@@ -47,6 +47,13 @@
         return div;
     }
 
+    const ensureUrlProtocol = (url) => {
+        if (!(url.startsWith('https://') || url.startsWith('http://'))) {
+            url = `https://${url}`;
+        }
+        return url;
+    }
+
     const createTableWithOffers = async (url_get_offers, offer_name, offers_number) => {
         const script = document.scripts[document.scripts.length - 1];
         const offers = await sendRequest('GET', url_get_offers, {'name': offer_name, 'max_offers_no': offers_number});
@@ -72,8 +79,13 @@
                 link.classList.add(...['elementor-element', 'elementor-element-1cb18cc5', 'e-con-boxed', 'e-flex', 'e-con', 'lista-link']);
                 link.dataset.element_type = 'container';
                 link.dataset.settings = '{&quot;content_width&quot;:&quot;boxed&quot;}';
-                link.dataset.non_affiliated_url = offer['url'];
-                link.href = offer['affiliation_url'];
+                
+                // Use a non-affiliated URL and eventually replace it on the click event.
+                link.href = ensureUrlProtocol(offer['url']);
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    window.open(ensureUrlProtocol(offer['affiliation_url']), '_blank');
+                });
                 link.rel = 'nofollow noindex sponsored noreferrer noopener';
                 link.target = '_blank';
 
