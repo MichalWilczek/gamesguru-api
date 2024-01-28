@@ -3,34 +3,34 @@ version: '3'
 
 volumes:
   db:
-  static:
-  media:
-  certbot-web:
-  proxy-dhparams:
-  certbot-certs:
+#  static:
+#  media:
+#  certbot-web:
+#  proxy-dhparams:
+#  certbot-certs:
 
 services:
-  gamesguru:
-    container_name: gamesguru
-    build:
-      context: .
-    restart: always
-    ports:
-      - "8000:8000"
-    volumes:
-      - static:/vol/web
-      - media:/vol/web/media
-    environment:
-      - DB_HOST=postgres
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - SECRET_KEY=${DJANGO_SECRET_KEY}
-      - ENV=${ENV}
-      - STATIC_URL=/static/static/
-      - STATIC_ROOT=/vol/web/static
-    depends_on:
-      - postgres
+#  gamesguru:
+#    container_name: gamesguru
+#    build:
+#      context: .
+#    restart: always
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - static:/vol/web
+#      - media:/vol/web/media
+#    environment:
+#      - DB_HOST=postgres
+#      - DB_NAME=${DB_NAME}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - SECRET_KEY=${DJANGO_SECRET_KEY}
+#      - ENV=${ENV}
+#      - STATIC_URL=/static/static/
+#      - STATIC_ROOT=/vol/web/static
+#    depends_on:
+#      - postgres
 
   postgres:
     container_name: postgres
@@ -45,38 +45,38 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
 
-  proxy:
-    container_name: proxy
-    build:
-      context: ./docker/proxy
-    restart: always
-    depends_on:
-      - gamesguru
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - certbot-web:/vol/www
-      - proxy-dhparams:/vol/proxy
-      - certbot-certs:/etc/letsencrypt
-      - static:/vol/static
-      - media:/vol/media
-    environment:
-      - DOMAIN=${DOMAIN}
-
-  certbot:
-    container_name: certbot
-    build:
-      context: ./docker/certbot
-    command: echo "Skipping..."
-    environment:
-      - EMAIL=${ACME_DEFAULT_EMAIL}
-      - DOMAIN=${DOMAIN}
-    volumes:
-      - certbot-web:/vol/www
-      - certbot-certs:/etc/letsencrypt
-    depends_on:
-      - proxy
+#  proxy:
+#    container_name: proxy
+#    build:
+#      context: ./docker/proxy
+#    restart: always
+#    depends_on:
+#      - gamesguru
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - certbot-web:/vol/www
+#      - proxy-dhparams:/vol/proxy
+#      - certbot-certs:/etc/letsencrypt
+#      - static:/vol/static
+#      - media:/vol/media
+#    environment:
+#      - DOMAIN=${DOMAIN}
+#
+#  certbot:
+#    container_name: certbot
+#    build:
+#      context: ./docker/certbot
+#    command: echo "Skipping..."
+#    environment:
+#      - EMAIL=${ACME_DEFAULT_EMAIL}
+#      - DOMAIN=${DOMAIN}
+#    volumes:
+#      - certbot-web:/vol/www
+#      - certbot-certs:/etc/letsencrypt
+#    depends_on:
+#      - proxy
 
   chromedriver:
     image: selenium/standalone-chrome:112.0-chromedriver-112.0
@@ -89,5 +89,5 @@ services:
       - "7900:7900"
     volumes:
       - /dev/shm:/dev/shm
-    depends_on:
-      - gamesguru
+#    depends_on:
+#      - gamesguru

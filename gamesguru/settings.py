@@ -29,15 +29,13 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'changeme')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
+ENABLE_ADMIN = False
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'corsheaders',
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -79,10 +77,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gamesguru.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -95,10 +91,8 @@ DATABASES = {
     },
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -114,33 +108,24 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', 'static/')
 STATIC_ROOT = os.environ.get('STATIC_ROOT', BASE_DIR / 'vol/web/static/')
 
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
-
 LOGGING = {
     'version': 1,
     'formatters': {
@@ -185,3 +170,8 @@ try:
     exec('from .config.%s_settings import *' % os.environ.get('ENV', 'local'))
 except ImportError as e:
     logging.error(e)
+
+if ENABLE_ADMIN:
+    INSTALLED_APPS.append(
+        "django.contrib.admin",
+    )
