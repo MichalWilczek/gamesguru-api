@@ -1,3 +1,14 @@
+# TODO:
+#  - Test the functionality with multiple search urls...
+#  - Replace string fields for filtering out names into ArrayFields
+#  - Write tests for filtering out specific name patterns (use some exemplary names from searched webpages)
+
+
+# TODO: Another MR
+#  - Add Morele for searching as well
+#  - Check why MediaMarkt doesn't work
+#  - Optionally, add Komputronik and Sferis
+
 import logging
 import re
 from enum import Enum
@@ -140,44 +151,56 @@ def scrap_offer_for_validity(offer: Offer) -> bool | None:
 
 
 def scrap_offers(product: Product, metadata: ShopMetadata):
-    try:
-        url = metadata.url.format(
-            host=metadata.host,
-            search_name=quote(product.search_name)
-        )
-        soup = scrap_webpage(url)
-        offers = soup.find_all(class_=re.compile(metadata.offer_box_name))
-    except BaseException as e:
-        _logger.error(f"Unexpected error while querying chromedriver. Skipping. Error: {e}")
-        return []
-
     results = []
-    for box in offers:
+    non_repeated_offer_urls = []
+
+    for search_name in product.search_names:
         try:
-            link_element = box.find('a', href=re.compile(product.base_name))
-            link = f"{metadata.host}{link_element['href']}"
+            url = metadata.url.format(
+                host=metadata.host,
+                search_name=quote(search_name)
+            )
+            soup = scrap_webpage(url)
+            offers = soup.find_all(class_=re.compile(metadata.offer_box_name))
+        except BaseException as e:
+            _logger.error(f"Unexpected error while querying chromedriver. Skipping. Error: {e}")
+            return []
 
-            name = get_offer_name(box, link_element, metadata)
-            if not is_name_valid(name, product):
-                continue
+        search_results = []
+        for box in offers:
+            try:
+                for base_name in product.base_names:
+                    link_element = box.find('a', href=re.compile(base_name))
+                    if link_element:  # TODO: Check if this logic works...
+                        break
 
-            price_value, price_currency = get_prices(box, metadata)
-            if not metadata.scraping_ignore_basket:
-                basket_name = box.find(string=re.compile(metadata.basket_text, re.IGNORECASE)).strip()
-                if not basket_name:
+                link = f"{metadata.host}{link_element['href']}"
+                if link in non_repeated_offer_urls:
                     continue
 
-            results.append(OfferSchemaIn(
-                name=name,
-                price=price_value,
-                currency=price_currency,
-                url=link
-            ))
+                name = get_offer_name(box, link_element, metadata)
+                if not is_name_valid(name, product):
+                    continue
 
-        except ValidationError:
-            _logger.error(f"offer element: {box} not validated. Skipping...")
-        except BaseException:
-            _logger.debug(f"Unexpected error for offer element. Probably formatting not possible.")
+                price_value, price_currency = get_prices(box, metadata)
+                if not metadata.scraping_ignore_basket:
+                    basket_name = box.find(string=re.compile(metadata.basket_text, re.IGNORECASE)).strip()
+                    if not basket_name:
+                        continue
+
+                search_results.append(OfferSchemaIn(
+                    name=name,
+                    price=price_value,
+                    currency=price_currency,
+                    url=link
+                ))
+
+            except ValidationError:
+                _logger.error(f"offer element: {box} not validated. Skipping...")
+            except BaseException:
+                _logger.debug(f"Unexpected error for offer element. Probably formatting not possible.")
+
+        results.extend(search_results)
 
     return results
 

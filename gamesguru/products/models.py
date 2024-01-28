@@ -2,6 +2,7 @@ import re
 import uuid
 
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import gettext_lazy
 from django.utils import timezone
 
@@ -48,7 +49,7 @@ class Product(models.Model):
         verbose_name_plural = "Products"
         constraints = [
             models.UniqueConstraint(fields=["name"], name="unique_name"),
-            models.UniqueConstraint(fields=["search_name"], name="unique_search_name")
+            models.UniqueConstraint(fields=["epi"], name="unique_epi"),
         ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
@@ -60,6 +61,16 @@ class Product(models.Model):
     search_words_all_to_include = models.TextField(max_length=1000, blank=True)
     epi = models.CharField(max_length=32, default=generate_random_string, auto_created=True)
     price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
+    base_names = ArrayField(
+        base_field=models.CharField(max_length=100, default=str(name)),
+        default=list,
+        blank=True
+    )
+    search_names = ArrayField(
+        base_field=models.CharField(max_length=100, default=str(name)),
+        default=list,
+        blank=True
+    )
 
     @property
     def search_words_any_to_exclude_list(self) -> list[str]:
