@@ -12,14 +12,33 @@ class ShopAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name', 'base_name', 'search_name']
     readonly_fields = ('id',)
-    list_display = ['name', 'epi', 'price_lower_limit', 'base_name', 'search_name', 'search_words_any_to_exclude', 'search_words_any_to_include', 'search_words_all_to_include']
+    list_display = [
+        'name',
+        'price_lower_limit',
+        'base_names',
+        'search_names',
+        'search_words_any_to_exclude',
+        'search_words_any_to_include',
+        'search_words_all_to_include'
+    ]
     ordering = ('-name', )
 
 
 class OfferAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name', 'price', 'currency', 'pub_time', 'product__name', 'shop__name']
     readonly_fields = ('id',)
-    list_display = ['name', 'price', 'currency', 'pub_time', 'state', 'state_check_time', 'url', 'affiliation_url', 'product', 'shop']
+    list_display = [
+        'name',
+        'price',
+        'currency',
+        'pub_time',
+        'state',
+        'state_check_time',
+        'url',
+        'affiliation_url',
+        'product',
+        'shop'
+    ]
     ordering = ('-pub_time', '-price')
 
 
