@@ -1,10 +1,18 @@
 import re
 import uuid
-import urllib.parse
 
 from django.db import models
 from django.utils.translation import gettext_lazy
 from django.utils import timezone
+
+from .affiliations import Tradedoubler, Convertiser
+from .utils import generate_random_string
+
+
+class Affiliation(models.TextChoices):
+    """List of available affiliation generators"""
+    TRADEDOUBLER = 'tradedoubler', gettext_lazy('Tradedoubler')
+    CONVERTISER = 'convertiser', gettext_lazy('Convertiser')
 
 
 class Shop(models.Model):
@@ -14,8 +22,21 @@ class Shop(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, auto_created=True)
     name = models.CharField(max_length=100)
+    affiliation = models.CharField(
+        max_length=20,
+        choices=Affiliation.choices,
+        default=Affiliation.TRADEDOUBLER
+    )
     tracking_url = models.TextField(max_length=1000, default=None, blank=True)
     show_on_smartphones = models.BooleanField(default=True)
+
+    @property
+    def affiliation_obj(self):
+        if self.affiliation == Affiliation.TRADEDOUBLER.value:
+            return Tradedoubler()
+        if self.affiliation == Affiliation.CONVERTISER.value:
+            return Convertiser()
+        raise ValueError(f'Affiliation object: {self.affiliation.name} unavailable')
 
     def __str__(self):
         return f"{self.name}"
@@ -37,7 +58,7 @@ class Product(models.Model):
     search_words_any_to_exclude = models.TextField(max_length=1000, blank=True)
     search_words_any_to_include = models.TextField(max_length=1000, blank=True)
     search_words_all_to_include = models.TextField(max_length=1000, blank=True)
-    epi = models.CharField(max_length=36, default=uuid.uuid4, auto_created=True)
+    epi = models.CharField(max_length=32, default=generate_random_string, auto_created=True)
     price_lower_limit = models.FloatField(null=True, blank=True)  # applied to avoid scam offers
 
     @property
@@ -86,5 +107,8 @@ class Offer(models.Model):
 
     @property
     def affiliation_url(self):
-        encoded_base_url = urllib.parse.quote(self.url, safe='')
-        return f"{self.shop.tracking_url}&epi={self.product.epi}&url={encoded_base_url}"
+        return self.shop.affiliation_obj.get_url(
+            base_url=self.shop.tracking_url,
+            epi=self.product.epi,
+            deep_link=self.url
+        )
