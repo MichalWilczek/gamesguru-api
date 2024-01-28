@@ -6,7 +6,7 @@ from . import models
 class ShopAdmin(admin.ModelAdmin):
     search_fields = ['id', 'name']
     readonly_fields = ('id', )
-    list_display = ['name', 'tracking_url', 'show_on_smartphones']
+    list_display = ['name', 'affiliation', 'tracking_url', 'show_on_smartphones']
 
 
 class ProductAdmin(admin.ModelAdmin):
