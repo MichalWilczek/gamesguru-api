@@ -169,7 +169,7 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             try:
                 for base_name in product.base_names:
                     link_element = box.find('a', href=re.compile(base_name))
-                    if link_element:  # TODO: Check if this logic works...
+                    if link_element:
                         break
 
                 link = f"{metadata.host}{link_element['href']}"
