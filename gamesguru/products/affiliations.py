@@ -12,6 +12,9 @@ class Convertiser:
         if base_url[-1] != '/':
             base_url += '/'
 
+        if 'https' not in deep_link:
+            deep_link = 'https://' + deep_link
+
         encoded_deep_link = urllib.parse.quote(deep_link, safe='')
         return f'{base_url}?deep_link={encoded_deep_link}&sid={epi}'
 

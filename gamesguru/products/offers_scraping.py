@@ -1,10 +1,8 @@
 # TODO:
-#  - Test the functionality with multiple search urls...
 #  - Write tests for filtering out specific name patterns (use some exemplary names from searched webpages)
 
 # TODO: Another MR
-#  - Add Morele for searching as well
-#  - Check why MediaMarkt doesn't work
+#  - Check why MediaMarkt & MediaExpert don't work
 #  - Optionally, add Komputronik and Sferis
 
 import logging
@@ -89,6 +87,14 @@ class OleOle(ShopMetadata):
     basket_text = "Do koszyka"
 
 
+class Morele(ShopMetadata):
+    host = "www.morele.net"
+    url = "https://{host}/wyszukiwarka/?q={search_name}"
+    offer_box_name = "cat-product card"
+    price_box_name = "price-new"
+    basket_text = "Do koszyka"
+
+
 class ShopEnum(str, Enum):
     empik = 'Empik'
     media_expert = 'Media Expert'
@@ -96,6 +102,7 @@ class ShopEnum(str, Enum):
     neonet = 'Neonet'
     ole_ole = 'OleOle'
     rtv_euro_agd = 'RTV EURO AGD'
+    morele = 'Morele'
 
 
 def get_metadata(shop: Shop) -> ShopMetadata | None:
@@ -113,6 +120,8 @@ def get_metadata(shop: Shop) -> ShopMetadata | None:
                 return RTVEuroAGD()
             case ShopEnum.ole_ole.value:
                 return OleOle()
+            case ShopEnum.morele.value:
+                return Morele()
             case other:
                 raise NameError()
     except NameError:
@@ -256,12 +265,19 @@ def get_prices(box, metadata: ShopMetadata) -> tuple:
 
     except BaseException:
         price_element = box.find(class_=re.compile(metadata.price_box_name))
-        price_value, price_currency = price_element.text.split()
-        if price_currency is None:
-            price_currency = "zł"
-        price_value = float(price_value.replace(',', '.'))
-        price_currency = ''.join(price_currency.split())
-        return price_value, price_currency
+
+        price_string = price_element.text
+        price_string = price_string.replace('\n', '')
+
+        price_value = re.findall(r'[0-9., ]+', price_string)[0].replace(' ', '')
+        currency_value = re.sub(r'[0-9.,]+', '', price_string)
+        if currency_value:
+            currency_value = currency_value.replace(' ', '')
+        else:
+            currency_value = 'zł'
+
+        price_value = float(price_value)
+        return price_value, currency_value
 
 
 def remove_ascii_characters(txt: str) -> str:
