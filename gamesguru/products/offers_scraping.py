@@ -276,6 +276,7 @@ def get_prices(box, metadata: ShopMetadata) -> tuple:
         else:
             currency_value = 'zł'
 
+        price_value = price_value.replace(',', '.')
         price_value = float(price_value)
         return price_value, currency_value
 
