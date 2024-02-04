@@ -8,8 +8,8 @@
 import logging
 import re
 from enum import Enum
-from urllib.parse import quote
 
+from urllib.parse import quote
 from pydantic import ValidationError
 
 from gamesguru.scraping import scrap_webpage
@@ -49,12 +49,23 @@ class RTVEuroAGD(ShopMetadata):
 
 class MediaMarkt(ShopMetadata):
     host = "mediamarkt.pl"
-    url = "https://{host}/search?query%5Bmenu_item%5D=&query%5Bquerystring%5D={search_name}"
-    offer_box_name = "offer"
-    price_box_name = "price-box"
-    price_value_name = "whole"
-    price_currency_name = "currency"
+    offer_box_name = "sc-78ebdf9c-0 duPMTS"
+    price_box_name = "sc-e9a876bf-0 hlFEGZ"
+    price_value_name = "sc-f1f881c4-0 eDRAfL sc-b5c27d99-2 fWQVGc"
+    price_currency_name = None
     basket_text = "do koszyka"
+
+    @property
+    def url(self):
+        link = f'https://{self.host}/pl/search.html'
+        query = 'query={search_name}'
+        # url = f'{link}?{query}'
+
+        from datetime import datetime
+        timestamp = f't={int(datetime.now().timestamp()*1000)}'
+        url = f'{link}?{query}&{timestamp}&ga_{query}'
+        # url = f'{link}?{query}&{timestamp}&ga_{query}&ga_queryHash=481cf0e512d45f91b2496f720b5fdec3626a8d78cdc7dbe305499e24a455aab6&ga_queryRequestId=481cf0e512d45f91b2496f720b5fdec3626a8d78cdc7dbe305499e24a455aab6'
+        return url
 
 
 class NeoNet(ShopMetadata):
@@ -173,6 +184,13 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             _logger.error(f"Unexpected error while querying chromedriver. Skipping. Error: {e}")
             return []
 
+        # a = soup.find('div', attrs={'data-test': 'mms-product-card'})
+        #
+        # print(len(soup.find_all(string=re.compile("data-test"))))
+        #
+        # soup.find_all(class_=re.compile('sc-78ebdf9c-0 duPMTS'))
+
+
         search_results = []
         for box in offers:
             try:
@@ -253,13 +271,18 @@ def is_name_valid(name: str, product: Product) -> bool:
 def get_prices(box, metadata: ShopMetadata) -> tuple:
     try:
         price_element = box.find(class_=re.compile(metadata.price_box_name))
-        price_value = price_element.find('span', class_=re.compile(metadata.price_value_name)).text
+        price_string = price_element.find('span', class_=re.compile(metadata.price_value_name)).text
         price_currency = price_element.find('span', class_=re.compile(metadata.price_currency_name))
         if price_currency is None:
             price_currency = "zł"
         else:
             price_currency = price_currency.text
-        price_value = float(''.join(price_value.split()))
+
+        price_string = price_string.replace('\n', '')
+        price_value = re.findall(r'[0-9., ]+', price_string)[0].replace(' ', '')
+        price_value = price_value.replace(',', '.')
+        price_value = float(price_value)
+
         price_currency = ''.join(price_currency.split())
         return price_value, price_currency
 

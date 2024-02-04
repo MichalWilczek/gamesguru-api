@@ -17,6 +17,11 @@ def get_url_data(url: str) -> str:
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
     options.add_argument('--ignore-certificate-errors')
+    options.add_argument('--headless')
+    options.add_argument(
+        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    )
 
     # Try to connect to the running container 'chromedriver' through the docker network.
     try:
