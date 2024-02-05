@@ -56,6 +56,8 @@ class Command(BaseCommand):
         for offer in offers:
             product = offer.product
             if product.price_lower_limit and offer.price < product.price_lower_limit:
+                _logger.info(f"Shop: {offer.shop.name}. Offer: {offer.name} with price: {offer.price} skipped. \n"
+                             f"Url: {offer.url}")
                 continue
             if offer.url in urls:
                 continue
