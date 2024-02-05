@@ -41,7 +41,7 @@ def get_url_data(url: str) -> str:
             driver = webdriver.Chrome()
 
     driver.get(url)
-    time.sleep(2)
+    time.sleep(5)
     scroll_down(driver)
     html_source = driver.page_source
     driver.quit()
