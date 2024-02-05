@@ -2,8 +2,8 @@
 #  - Write tests for filtering out specific name patterns (use some exemplary names from searched webpages)
 
 # TODO: Another MR
-#  - Check why MediaMarkt & MediaExpert don't work
-#  - Optionally, add Komputronik and Sferis
+#  - Check why MediaMarkt
+#  - Optionally, add Sferis
 
 import logging
 import re
