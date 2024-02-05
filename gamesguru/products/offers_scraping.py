@@ -272,6 +272,7 @@ def get_prices(box, metadata: ShopMetadata) -> tuple:
             price_currency = price_currency.text
 
         price_string = price_string.replace('\n', '')
+        price_string = ' '.join(price_string.split())  # To remove non unicode characters
         price_value = re.findall(r'[0-9., ]+', price_string)[0].replace(' ', '')
         price_value = price_value.replace(',', '.')
         price_value = float(price_value)
@@ -284,6 +285,7 @@ def get_prices(box, metadata: ShopMetadata) -> tuple:
 
         price_string = price_element.text
         price_string = price_string.replace('\n', '')
+        price_string = ' '.join(price_string.split())  # To remove non unicode characters
 
         price_value = re.findall(r'[0-9., ]+', price_string)[0].replace(' ', '')
         currency_value = re.sub(r'[0-9.,]+', '', price_string)
