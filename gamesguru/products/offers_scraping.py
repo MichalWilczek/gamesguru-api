@@ -184,13 +184,6 @@ def scrap_offers(product: Product, metadata: ShopMetadata):
             _logger.error(f"Unexpected error while querying chromedriver. Skipping. Error: {e}")
             return []
 
-        # a = soup.find('div', attrs={'data-test': 'mms-product-card'})
-        #
-        # print(len(soup.find_all(string=re.compile("data-test"))))
-        #
-        # soup.find_all(class_=re.compile('sc-78ebdf9c-0 duPMTS'))
-
-
         search_results = []
         for box in offers:
             try:
