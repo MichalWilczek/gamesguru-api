@@ -25,7 +25,7 @@
         return paragraph;
     }
 
-    const createWidget = (innerElement, widgetClasses) => {
+    const createWidget = (widgetClasses, innerElements = []) => {
         const div = document.createElement('div');
         div.classList.add(...['elementor-element', 'elementor-widget', 'elementor-widget-text-editor']);
         div.classList.add(...widgetClasses);
@@ -38,7 +38,7 @@
         const subSubDiv = document.createElement('div');
         subSubDiv.classList.add(...['elementor-text-editor', 'elementor-clearfix']);
 
-        if (innerElement !== null) {
+        for (let innerElement of innerElements) {
             subSubDiv.append(innerElement);
         }
         subDiv.append(subSubDiv);
@@ -54,7 +54,7 @@
         return url;
     }
 
-    const createTableWithOffers = async (url_get_offers, offer_name, offers_number) => {
+    const createTableWithOffers = async (url_get_offers, offer_name, offers_number, discounts = []) => {
         const script = document.scripts[document.scripts.length - 1];
         const offers = await sendRequest('GET', url_get_offers, {'name': offer_name, 'max_offers_no': offers_number});
         const container = document.createElement('div');
@@ -73,7 +73,8 @@
             const sectionWrap = document.createElement('div');
             sectionWrap.classList.add('lista');
 
-            for (let offer of offers) {
+            for (let i = 0; i < offers.length; i++) {
+                offer = offers[i];
 
                 const link = document.createElement('a');
                 link.classList.add(...['elementor-element', 'elementor-element-1cb18cc5', 'e-con-boxed', 'e-flex', 'e-con', 'lista-link']);
@@ -93,23 +94,43 @@
                 linkDiv.classList.add('lista-produkt');
 
                 const nameDiv = createWidget(
-                    createParagraph(offer['name']),
-                    ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul']
+                    ['elementor-element-52be0de3', 'elementor-widget-mobile__width-inherit', 'lista-produkt-tytul'],
+                    [createParagraph(offer['name'])]
                 );
-                const priceDiv = createWidget(
-                    createParagraph(`${offer['price']} ${offer['currency']}`),
-                    ['elementor-element-6a0067ff', 'lista-produkt-cena']
-                );
+
+                let PriceDiv = null;
+                const currentPriceParagraph = createParagraph(`${offer['price']} ${offer['currency']}`);
+                currentPriceParagraph.classList.add('current-price');
+                try {
+                    const oldPrice = offer['price'] + discounts[i];
+                    const oldPriceParagraph = createParagraph(`${oldPrice} ${offer['currency']}`);
+                    oldPriceParagraph.classList.add('old-price');
+                    
+                    priceDiv = createWidget(
+                        ['elementor-element-6a0067ff', 'lista-produkt-cena'],
+                        [
+                            oldPriceParagraph,
+                            currentPriceParagraph
+                        ]
+                    );
+
+                } catch (error) {
+                    priceDiv = createWidget(
+                        ['elementor-element-6a0067ff', 'lista-produkt-cena'],
+                        [currentPriceParagraph]
+                    );
+                }
+
                 const shopDiv = createWidget(
-                    createParagraph(offer['shop_name']),
-                    ['elementor-element-5aaec845', 'lista-produkt-rabat']
+                    ['elementor-element-5aaec845', 'lista-produkt-rabat'],
+                    [createParagraph(offer['shop_name'])]
                 );
 
                 const iElement = document.createElement('i');
                 iElement.classList.add(...['fas', 'fa-link']);
                 const smallUrlDiv = createWidget(
-                    iElement,
-                    ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta']
+                    ['elementor-element-7dbc075d', 'elementor-absolute', 'lista-produkt-cta'],
+                    [iElement]
                 );
 
                 linkDiv.append(nameDiv);
