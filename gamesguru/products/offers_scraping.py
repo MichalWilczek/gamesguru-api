@@ -165,6 +165,8 @@ def scrap_offer_for_validity(offer: Offer) -> bool | None:
     basket_name = soup.find(string=re.compile(metadata.basket_text, re.IGNORECASE))
     if basket_name and len(basket_name) < 200:
         return True
+    _logger.warning(f'Offer outdated: {offer.shop} - {offer.name}.')
+    _logger.warning(f'Basket name: {basket_name}')
     return False
 
 
